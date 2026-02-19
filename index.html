@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Mob Encyclopedia</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  :root {
+    --bg-dark: #0d0d0d;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #222222;
+    --bg-modal: #111111;
+    --border-stone: #3a3a3a;
+    --border-highlight: #4a4a4a;
+    --green: #4caf50;
+    --green-light: #6fcf73;
+    --green-dark: #2e7d32;
+    --red: #e53935;
+    --yellow: #ffc107;
+    --blue: #2196f3;
+    --purple: #9c27b0;
+    --orange: #ff9800;
+    --text-primary: #e0e0e0;
+    --text-secondary: #9e9e9e;
+    --text-dim: #616161;
+    --passive: #4caf50;
+    --neutral: #ffc107;
+    --hostile: #e53935;
+    --boss: #9c27b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Press Start 2P', monospace, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at top, #0a1a0a 0%, #0d0d0d 60%);
+  }
+
+  /* ── HEADER ──────────────────────────────────────────────── */
+  header {
+    background: linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+    border-bottom: 3px solid var(--green-dark);
+    padding: 24px 20px 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.8);
+  }
+
+  header h1 {
+    font-size: clamp(14px, 3vw, 26px);
+    color: var(--green);
+    text-shadow: 0 0 20px rgba(76,175,80,0.5), 3px 3px 0 #000;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  header p.subtitle {
+    font-size: 7px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+  }
+
+  /* ── CONTROLS ────────────────────────────────────────────── */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .search-wrapper {
+    position: relative;
+    flex: 1 1 220px;
+    max-width: 340px;
+  }
+
+  .search-wrapper::before {
+    content: '🔍';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+  }
+
+  #searchInput {
+    width: 100%;
+    padding: 10px 12px 10px 34px;
+    background: #1a1a1a;
+    border: 2px solid var(--border-stone);
+    border-radius: 2px;
+    color: var(--text-primary);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #searchInput:focus { border-color: var(--green); }
+  #searchInput::placeholder { color: var(--text-dim); }
+
+  .filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .filter-btn {
+    padding: 8px 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 7px;
+    border: 2px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #1a1a1a;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    image-rendering: pixelated;
+  }
+
+  .filter-btn:hover { transform: translateY(-1px); filter: brightness(1.3); }
+
+  .filter-btn.active, .filter-btn[data-cat="all"].active {
+    color: #fff;
+    text-shadow: 0 0 8px currentColor;
+  }
+
+  .filter-btn[data-cat="all"]       { border-color: var(--border-highlight); }
+  .filter-btn[data-cat="all"].active  { background: #333; border-color: #999; }
+  .filter-btn[data-cat="passive"]   { border-color: var(--passive); }
+  .filter-btn[data-cat="passive"].active  { background: #1b3a1c; border-color: var(--passive); color: var(--passive); }
+  .filter-btn[data-cat="neutral"]   { border-color: var(--neutral); }
+  .filter-btn[data-cat="neutral"].active  { background: #3a2e00; border-color: var(--neutral); color: var(--neutral); }
+  .filter-btn[data-cat="hostile"]   { border-color: var(--hostile); }
+  .filter-btn[data-cat="hostile"].active  { background: #3a0a0a; border-color: var(--hostile); color: var(--hostile); }
+  .filter-btn[data-cat="boss"]      { border-color: var(--boss); }
+  .filter-btn[data-cat="boss"].active     { background: #2a0a3a; border-color: var(--boss); color: var(--boss); }
+
+  /* ── STATS BAR ───────────────────────────────────────────── */
+  .stats-bar {
+    text-align: center;
+    font-size: 7px;
+    color: var(--text-dim);
+    padding: 10px 20px 0;
+    letter-spacing: 1px;
+  }
+
+  /* ── GRID ────────────────────────────────────────────────── */
+  .grid-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+
+  .mob-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  /* ── MOB CARD ────────────────────────────────────────────── */
+  .mob-card {
+    background: var(--bg-card);
+    border: 2px solid var(--border-stone);
+    border-radius: 2px;
+    padding: 14px 10px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.12s, border-color 0.12s, background 0.12s, box-shadow 0.12s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mob-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .mob-card:hover {
+    transform: translateY(-3px) scale(1.02);
+    background: var(--bg-card-hover);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  }
+
+  .mob-card[data-cat="passive"]:hover  { border-color: var(--passive); box-shadow: 0 8px 24px rgba(76,175,80,0.25); }
+  .mob-card[data-cat="neutral"]:hover  { border-color: var(--neutral); box-shadow: 0 8px 24px rgba(255,193,7,0.25); }
+  .mob-card[data-cat="hostile"]:hover  { border-color: var(--hostile); box-shadow: 0 8px 24px rgba(229,57,53,0.25); }
+  .mob-card[data-cat="boss"]:hover     { border-color: var(--boss);    box-shadow: 0 8px 24px rgba(156,39,176,0.35); }
+
+  .mob-card.hidden { display: none; }
+
+  .cat-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 0;
+    image-rendering: pixelated;
+  }
+
+  .mob-card[data-cat="passive"]  .cat-dot { background: var(--passive); }
+  .mob-card[data-cat="neutral"]  .cat-dot { background: var(--neutral); }
+  .mob-card[data-cat="hostile"]  .cat-dot { background: var(--hostile); }
+  .mob-card[data-cat="boss"]     .cat-dot { background: var(--boss);    box-shadow: 0 0 8px var(--boss); }
+
+  .mob-img-wrap {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    image-rendering: pixelated;
+  }
+
+  .mob-img-wrap img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    transition: transform 0.2s;
+  }
+
+  .mob-card:hover .mob-img-wrap img { transform: scale(1.1); }
+
+  .mob-emoji-fallback {
+    font-size: 40px;
+    line-height: 1;
+  }
+
+  .mob-name {
+    font-size: 7px;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  /* ── NO RESULTS ──────────────────────────────────────────── */
+  .no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+    font-size: 9px;
+    display: none;
+  }
+
+  /* ── MODAL ───────────────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal {
+    background: var(--bg-modal);
+    border: 3px solid var(--border-stone);
+    border-radius: 2px;
+    max-width: 580px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.92) translateY(20px);
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-stone) transparent;
+  }
+
+  .modal-overlay.open .modal {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 20px 16px;
+    border-bottom: 2px solid var(--border-stone);
+    position: relative;
+  }
+
+  .modal-mob-img {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .modal-mob-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9));
+  }
+
+  .modal-title-block { flex: 1; }
+
+  .modal-name {
+    font-size: clamp(10px, 2.5vw, 16px);
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 0 #000;
+  }
+
+  .cat-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 7px;
+    border-radius: 2px;
+    border: 1px solid;
+    letter-spacing: 1px;
+  }
+
+  .cat-badge.passive { color: var(--passive); border-color: var(--passive); background: rgba(76,175,80,0.1); }
+  .cat-badge.neutral { color: var(--neutral); border-color: var(--neutral); background: rgba(255,193,7,0.1); }
+  .cat-badge.hostile { color: var(--hostile); border-color: var(--hostile); background: rgba(229,57,53,0.1); }
+  .cat-badge.boss    { color: var(--boss);    border-color: var(--boss);    background: rgba(156,39,176,0.15); }
+
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: none;
+    border: 2px solid var(--border-stone);
+    color: var(--text-secondary);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 2px;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+
+  .modal-close:hover { border-color: var(--hostile); color: var(--hostile); }
+
+  .modal-body { padding: 20px; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-block {
+    background: #1a1a1a;
+    border: 1px solid var(--border-stone);
+    border-radius: 2px;
+    padding: 10px 12px;
+  }
+
+  .stat-label {
+    font-size: 6px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .stat-value {
+    font-size: 8px;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+
+  .hp-bar-wrap {
+    margin-top: 6px;
+    height: 6px;
+    background: #2a2a2a;
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .hp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-dark), var(--green));
+    image-rendering: pixelated;
+  }
+
+  .section-title {
+    font-size: 8px;
+    color: var(--green);
+    margin: 16px 0 8px;
+    letter-spacing: 1px;
+    border-left: 3px solid var(--green);
+    padding-left: 8px;
+  }
+
+  .section-text {
+    font-size: 7px;
+    color: var(--text-secondary);
+    line-height: 2;
+  }
+
+  .drops-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .drop-tag {
+    background: #1e1e1e;
+    border: 1px solid var(--border-stone);
+    border-radius: 2px;
+    padding: 4px 7px;
+    font-size: 6.5px;
+    color: var(--yellow);
+    letter-spacing: 0.5px;
+  }
+
+  /* Scrollbar */
+  .modal::-webkit-scrollbar { width: 6px; }
+  .modal::-webkit-scrollbar-track { background: transparent; }
+  .modal::-webkit-scrollbar-thumb { background: var(--border-stone); border-radius: 2px; }
+
+  /* ── FOOTER ──────────────────────────────────────────────── */
+  footer {
+    text-align: center;
+    font-size: 6px;
+    color: var(--text-dim);
+    padding: 20px;
+    border-top: 1px solid var(--border-stone);
+    letter-spacing: 1px;
+  }
+
+  /* ── RESPONSIVE ──────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    .mob-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+    .stat-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── BOSS GLOW ANIMATION ─────────────────────────────────── */
+  @keyframes bossGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(156,39,176,0.3); }
+    50%       { box-shadow: 0 0 20px rgba(156,39,176,0.7); }
+  }
+
+  .mob-card[data-cat="boss"] {
+    animation: bossGlow 2.5s ease-in-out infinite;
+    border-color: #5a1a7a;
+  }
+
+  /* ── PIXEL GRID TEXTURE ──────────────────────────────────── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+    background-size: 32px 32px;
+    z-index: 0;
+  }
+
+  header, .grid-container, .modal-overlay { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚔ MINECRAFT MOB ENCYCLOPEDIA ⚔</h1>
+  <p class="subtitle">JAVA EDITION 1.21+ · ALL MOBS · CLICK TO EXPLORE</p>
+  <div class="controls">
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" placeholder="Search mobs..." autocomplete="off" spellcheck="false">
+    </div>
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-cat="all">ALL</button>
+      <button class="filter-btn" data-cat="passive">🌿 PASSIVE</button>
+      <button class="filter-btn" data-cat="neutral">⚡ NEUTRAL</button>
+      <button class="filter-btn" data-cat="hostile">💀 HOSTILE</button>
+      <button class="filter-btn" data-cat="boss">👑 BOSS</button>
+    </div>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <span id="statsText">Loading...</span>
+</div>
+
+<div class="grid-container">
+  <div class="mob-grid" id="mobGrid">
+    <div class="no-results" id="noResults">No mobs found. Try a different search!</div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header" id="modalHeader">
+      <div class="modal-mob-img" id="modalImg"></div>
+      <div class="modal-title-block">
+        <div class="modal-name" id="modalName"></div>
+        <span class="cat-badge" id="modalCat"></span>
+      </div>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<footer>
+  NOT OFFICIAL — FAN PROJECT · MINECRAFT IS A TRADEMARK OF MOJANG STUDIOS
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════════
+//  MOB DATA
+// ════════════════════════════════════════════════════════════
+const MOBS = [
+  // ── PASSIVE ──────────────────────────────────────────────
+  {
+    id: 'cow', name: 'Cow', cat: 'passive', emoji: '🐄',
+    img: 'https://minecraft.wiki/images/Cow_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Grass biomes (Plains, Forest, Meadow)',
+    drops: ['Leather (0–2)', 'Raw Beef (1–3)', 'Milk (bucket)'],
+    desc: 'A gentle farm animal that wanders grassy biomes. Cows can be milked with a bucket and bred with wheat. They drop leather and beef, making them one of the most useful passive mobs in the early game.'
+  },
+  {
+    id: 'pig', name: 'Pig', cat: 'passive', emoji: '🐷',
+    img: 'https://minecraft.wiki/images/Pig_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Grass biomes, Villages',
+    drops: ['Raw Porkchop (1–3)'],
+    desc: 'A classic Minecraft mob with a love for carrots. Pigs can be ridden with a saddle and steered with a carrot on a stick. They breed with carrots, potatoes, or beetroot. Struck by lightning, they transform into Zombie Piglins.'
+  },
+  {
+    id: 'sheep', name: 'Sheep', cat: 'passive', emoji: '🐑',
+    img: 'https://minecraft.wiki/images/Sheep_face.png',
+    hp: 8, hpMax: 16,
+    spawn: 'Grass biomes (Plains, Forest)',
+    drops: ['Wool (1)', 'Raw Mutton (1–2)'],
+    desc: 'Sheep are the primary source of wool, available in 16 natural colors. They can be sheared repeatedly and dyed. Rare colors like pink (0.16%) and brown (3%) exist. They breed with wheat and regrow wool by eating grass.'
+  },
+  {
+    id: 'chicken', name: 'Chicken', cat: 'passive', emoji: '🐔',
+    img: 'https://minecraft.wiki/images/Chicken_face.png',
+    hp: 4, hpMax: 8,
+    spawn: 'Grass biomes, Villages',
+    drops: ['Feather (0–2)', 'Raw Chicken (1)', 'Egg (periodically)'],
+    desc: 'Small and fluttery, chickens lay eggs roughly every 5–10 minutes. They fall slowly, are immune to fall damage, and can be attracted with seeds. Baby chickens hatch from thrown eggs (1/8 chance). A staple passive mob for early farms.'
+  },
+  {
+    id: 'rabbit', name: 'Rabbit', cat: 'passive', emoji: '🐇',
+    img: 'https://minecraft.wiki/images/Rabbit_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Desert, Tundra, Meadow, Taiga, Flower Forest',
+    drops: ['Rabbit Hide (0–1)', 'Raw Rabbit (1)', 'Rabbit\'s Foot (10% rare)'],
+    desc: 'Timid creatures that hop away from players. Rabbits come in 6 color variants based on biome. The ultra-rare Rabbit\'s Foot is used in brewing potions of leaping. The legendary "Killer Bunny" variant (only via commands) is hostile.'
+  },
+  {
+    id: 'bat', name: 'Bat', cat: 'passive', emoji: '🦇',
+    img: 'https://minecraft.wiki/images/Bat_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Caves below y=63 (dark areas)',
+    drops: [],
+    desc: 'Nocturnal cave dwellers that hang upside down from ceilings during the day. Bats emit squeaking sounds and are entirely harmless. They drop nothing but serve as atmospheric indicators of dark cave systems beneath the surface.'
+  },
+  {
+    id: 'cat', name: 'Cat', cat: 'passive', emoji: '🐱',
+    img: 'https://minecraft.wiki/images/Cat_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Villages, Swamp Huts (witch huts)',
+    drops: ['String (0–2 when killed)'],
+    desc: 'Cats spawn in villages near villagers. They can be tamed with raw cod or salmon. Tamed cats give the player a random morning gift. Creepers and Phantoms avoid cats, making them great base companions. 11 coat variants exist.'
+  },
+  {
+    id: 'wolf', name: 'Wolf', cat: 'neutral', emoji: '🐺',
+    img: 'https://minecraft.wiki/images/Wolf_face.png',
+    hp: 8, hpMax: 16,
+    spawn: 'Taiga, Old Growth Taiga, Sparse Jungle',
+    drops: [],
+    desc: 'Wolves are neutral until provoked or their pack is attacked. Tamed with bones, they become loyal dogs that follow and protect players. Armored variants exist in different biomes. Tamed wolves have 20 HP and can be healed with meat.'
+  },
+  {
+    id: 'horse', name: 'Horse', cat: 'passive', emoji: '🐴',
+    img: 'https://minecraft.wiki/images/Horse_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'Plains, Savanna',
+    drops: ['Leather (0–2)'],
+    desc: 'Horses are tameable mounts ridden with a saddle. They have 7 coat colors and 5 marking patterns, creating 35 unique visual variants. Speed, jump height, and health vary randomly. Bred with golden apples or golden carrots.'
+  },
+  {
+    id: 'donkey', name: 'Donkey', cat: 'passive', emoji: '🫏',
+    img: 'https://minecraft.wiki/images/Donkey_face.png',
+    hp: 13, hpMax: 26,
+    spawn: 'Plains, Savanna',
+    drops: ['Leather (0–2)'],
+    desc: 'Donkeys can be equipped with a chest for 15 slots of mobile storage — essential for long expeditions. They are slower than horses but invaluable for hauling. Bred with horses to produce mules.'
+  },
+  {
+    id: 'mule', name: 'Mule', cat: 'passive', emoji: '🐴',
+    img: 'https://minecraft.wiki/images/Mule_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'Bred from Horse + Donkey',
+    drops: ['Leather (0–2)'],
+    desc: 'The offspring of a horse and donkey. Mules combine decent speed with the ability to carry a chest. They cannot breed further, being infertile hybrids. Faster than donkeys and more practical than horses for storage runs.'
+  },
+  {
+    id: 'llama', name: 'Llama', cat: 'neutral', emoji: '🦙',
+    img: 'https://minecraft.wiki/images/Llama_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'Savanna, Mountains, Windswept Savanna',
+    drops: ['Leather (0–2)'],
+    desc: 'Llamas are tameable but not rideable (without leads). They can carry a chest (3–15 slots depending on strength) and spit at threats. Wandering Traders arrive leading two llamas. Llamas in a caravan follow leads, making them portable storage convoys.'
+  },
+  {
+    id: 'parrot', name: 'Parrot', cat: 'passive', emoji: '🦜',
+    img: 'https://minecraft.wiki/images/Parrot_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Jungle',
+    drops: ['Feather (1–2)'],
+    desc: 'Colourful jungle birds that mimic the sounds of nearby mobs — a handy (and adorable) alert system. Tamed with seeds, they sit on the player\'s shoulder. Available in 5 colors: red, green, blue, cyan, and gray. Do NOT feed them cookies!'
+  },
+  {
+    id: 'mooshroom', name: 'Mooshroom', cat: 'passive', emoji: '🍄',
+    img: 'https://minecraft.wiki/images/Mooshroom_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Mushroom Fields (rare biome)',
+    drops: ['Leather (0–2)', 'Raw Beef (1–3)', 'Mushroom (when sheared)'],
+    desc: 'A red-and-white mushroom-covered cow found only in the rare Mushroom Fields biome. Can be milked for Mushroom Stew with a bowl. Shearing removes its mushrooms and turns it into a normal cow. A rare brown variant exists (spawns from lightning strikes).'
+  },
+  {
+    id: 'squid', name: 'Squid', cat: 'passive', emoji: '🦑',
+    img: 'https://minecraft.wiki/images/Squid_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Ocean, Rivers (below y=62)',
+    drops: ['Ink Sac (1–3)'],
+    desc: 'Eight-armed ocean dwellers that release a cloud of ink particles when attacked. Squids move by jetting water. Ink sacs are used for black dye and writing in books. They suffocate on land and are passive to all threats.'
+  },
+  {
+    id: 'glow_squid', name: 'Glow Squid', cat: 'passive', emoji: '✨',
+    img: 'https://minecraft.wiki/images/Glow_Squid_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Deep ocean, Underground water (below y=30, dark)',
+    drops: ['Glow Ink Sac (1–3)'],
+    desc: 'A bioluminescent cousin of the squid found in dark underwater depths. When attacked, it emits glowing ink and loses its glow temporarily. Glow Ink Sacs make signs glow and create glow item frames. Added in the Caves & Cliffs update.'
+  },
+  {
+    id: 'axolotl', name: 'Axolotl', cat: 'passive', emoji: '🦎',
+    img: 'https://minecraft.wiki/images/Axolotl_face.png',
+    hp: 14, hpMax: 28,
+    spawn: 'Lush Caves (underground water)',
+    drops: [],
+    desc: 'Aquatic amphibians that attack fish, squid, and drowned mobs — making them ideal companions for ocean combat. They come in 5 colors; the rare blue variant has a 1/1200 chance. They can be scooped into buckets and play dead when damaged.'
+  },
+  {
+    id: 'frog', name: 'Frog', cat: 'passive', emoji: '🐸',
+    img: 'https://minecraft.wiki/images/Frog_face.png',
+    hp: 5, hpMax: 10,
+    spawn: 'Swamp, Mangrove Swamp',
+    drops: [],
+    desc: 'Frogs come in 3 variants — temperate (orange), warm (white), and cold (green) — depending on the temperature where tadpoles mature. They eat small slimes and small magma cubes, producing Froglight blocks. Added in the Wild Update.'
+  },
+  {
+    id: 'tadpole', name: 'Tadpole', cat: 'passive', emoji: '🐟',
+    img: 'https://minecraft.wiki/images/Tadpole_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Spawned by Frogs in water',
+    drops: [],
+    desc: 'Baby frogs that exist only in water. They grow into frogs whose variant depends on the temperature of the biome they mature in. Can be collected in buckets. The smallest mob in the game by volume.'
+  },
+  {
+    id: 'sniffer', name: 'Sniffer', cat: 'passive', emoji: '🦕',
+    img: 'https://minecraft.wiki/images/Sniffer_face.png',
+    hp: 14, hpMax: 28,
+    spawn: 'Hatched from Sniffer Eggs (found in Ocean Ruins)',
+    drops: ['Torchflower Seeds', 'Pitcher Pods'],
+    desc: 'An ancient mob resurrected from eggs found in ocean ruins. The largest passive mob in the game, sniffers use their giant nose to sniff out ancient plant seeds — torchflower seeds and pitcher pods — buried in dirt and grass blocks. Added in Java 1.20.'
+  },
+  {
+    id: 'allay', name: 'Allay', cat: 'passive', emoji: '🧚',
+    img: 'https://minecraft.wiki/images/Allay_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Pillager Outposts (cages), Woodland Mansions (cages)',
+    drops: [],
+    desc: 'A small, helpful fairy-like mob found caged in outposts and mansions. When given an item, the Allay collects matching items from the world and brings them to the player or to a nearby note block. It duplicates when given an amethyst shard while dancing near a note block. The mob vote winner of Minecraft Live 2021.'
+  },
+  {
+    id: 'strider', name: 'Strider', cat: 'passive', emoji: '🔴',
+    img: 'https://minecraft.wiki/images/Strider_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Nether (Lava Sea, Crimson Forest)',
+    drops: ['String (2–5)'],
+    desc: 'Strange lava-walking creatures of the Nether. Striders are the only mobs that can safely traverse lava oceans and can be ridden with a saddle, steered with a warped fungus on a stick. They shiver and turn purple when on land or in rain.'
+  },
+  {
+    id: 'turtle', name: 'Turtle', cat: 'passive', emoji: '🐢',
+    img: 'https://minecraft.wiki/images/Turtle_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'Stony Shore, Beach',
+    drops: ['Seagrass (0–2)', 'Scute (baby, when growing up)'],
+    desc: 'Turtles are slow on land but swift underwater. They always return to their home beach to lay eggs (3–4) after breeding with seagrass. Baby turtles drop scutes when they grow up — 5 scutes craft a Turtle Shell helmet that grants Water Breathing.'
+  },
+  {
+    id: 'panda', name: 'Panda', cat: 'neutral', emoji: '🐼',
+    img: 'https://minecraft.wiki/images/Panda_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Jungle, Bamboo Jungle',
+    drops: ['Bamboo (1)', 'Slimeball (rare)'],
+    desc: 'Pandas have 7 personality types: normal, lazy, worried, playful, aggressive, weak, and brown. They breed with bamboo and the rare hidden gene system determines offspring personality. Worried pandas sneeze and look away from thunderstorms.'
+  },
+  {
+    id: 'fox', name: 'Fox', cat: 'passive', emoji: '🦊',
+    img: 'https://minecraft.wiki/images/Fox_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Taiga, Old Growth Taiga, Grove (snow fox variant)',
+    drops: ['Whatever item they are holding'],
+    desc: 'Clever, skittish foxes that sleep during the day and hunt at night. They attack chickens, rabbits, and fish. Foxes trust the player if bred in captivity. They can hold items in their mouths and occasionally pick up food or dropped items.'
+  },
+  {
+    id: 'bee', name: 'Bee', cat: 'neutral', emoji: '🐝',
+    img: 'https://minecraft.wiki/images/Bee_face.png',
+    hp: 5, hpMax: 10,
+    spawn: 'Flower Forest, Plains, Sunflower Plains, Mangrove Swamp (near Bee Nests)',
+    drops: [],
+    desc: 'Bees pollinate flowers and return to their hive. If their hive is destroyed without Silk Touch, they become hostile. They sting once (poisoning the player) then die. Honeycombs and honey bottles are harvested from full hives using shears or bottles with a campfire beneath.'
+  },
+  {
+    id: 'tropical_fish', name: 'Tropical Fish', cat: 'passive', emoji: '🐠',
+    img: 'https://minecraft.wiki/images/Tropical_Fish_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Warm Ocean, Lukewarm Ocean, Lush Caves (underwater)',
+    drops: ['Tropical Fish (1)', 'Bone Meal (rare)'],
+    desc: 'With 2700+ possible color and shape combinations, tropical fish are the most visually diverse mob in the game. They travel in schools and can be collected in buckets. 22 "common" named variants exist alongside countless procedurally generated ones.'
+  },
+  {
+    id: 'cod', name: 'Cod', cat: 'passive', emoji: '🐟',
+    img: 'https://minecraft.wiki/images/Cod_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Lukewarm, Normal, Cold Ocean, River',
+    drops: ['Raw Cod (1)', 'Bone Meal (rare)'],
+    desc: 'Common fish that swim in schools across most ocean biomes. Cod is a foundational early-game food source and an essential taming item for cats, dolphins, and axolotls. They can be caught in buckets and cooked into a valuable food item.'
+  },
+  {
+    id: 'salmon', name: 'Salmon', cat: 'passive', emoji: '🐟',
+    img: 'https://minecraft.wiki/images/Salmon_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Cold Ocean, River, Frozen Ocean',
+    drops: ['Raw Salmon (1)', 'Bone Meal (rare)'],
+    desc: 'Salmon spawn in cold ocean biomes and rivers, including frozen variants. They come in 3 sizes: small, normal, and large. Cooked salmon restores more hunger than cooked cod, making it a top-tier early food. Also used to tame cats and dolphins.'
+  },
+  {
+    id: 'pufferfish', name: 'Pufferfish', cat: 'passive', emoji: '🐡',
+    img: 'https://minecraft.wiki/images/Pufferfish_face.png',
+    hp: 3, hpMax: 6,
+    spawn: 'Warm Ocean, Lukewarm Ocean',
+    drops: ['Pufferfish (1)'],
+    desc: 'Pufferfish inflate into a spiky ball when approached, inflicting Poison and Nausea on contact. Despite their hostility, they are classified as passive since they never seek out players. Pufferfish are essential for brewing Potions of Water Breathing.'
+  },
+  {
+    id: 'dolphin', name: 'Dolphin', cat: 'neutral', emoji: '🐬',
+    img: 'https://minecraft.wiki/images/Dolphin_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Non-frozen Ocean biomes',
+    drops: ['Raw Cod (0–1)'],
+    desc: 'Playful, social cetaceans that leap out of water and ride boat wakes. Dolphins grant the Dolphin\'s Grace status effect to nearby swimming players, greatly boosting swim speed. They lead players to buried treasure and ocean ruins when fed raw fish. They attack players who harm them.'
+  },
+  {
+    id: 'goat', name: 'Goat', cat: 'neutral', emoji: '🐐',
+    img: 'https://minecraft.wiki/images/Goat_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Jagged Peaks, Frozen Peaks, Snowy Slopes, Grove',
+    drops: ['Goat Horn (when ramming hard blocks)'],
+    desc: 'Mountain-dwelling goats that occasionally ram into players and mobs unprovoked, launching them into the air. Screaming Goat variants (2% of spawns) ram much more frequently. They can drop up to 2 unique Goat Horns per goat by ramming hard blocks. Can be milked.'
+  },
+  {
+    id: 'camel', name: 'Camel', cat: 'passive', emoji: '🐪',
+    img: 'https://minecraft.wiki/images/Camel_face.png',
+    hp: 16, hpMax: 32,
+    spawn: 'Desert Villages',
+    drops: [],
+    desc: 'A tall rideable mob that fits two players on one saddle — ideal for cooperative exploration. Camels walk faster than horses and can dash forward with a cooldown. They sidestep zombies because camels are tall enough that most hostile mobs can\'t reach the rider. Added in Java 1.20.'
+  },
+  {
+    id: 'armadillo', name: 'Armadillo', cat: 'passive', emoji: '🪲',
+    img: 'https://minecraft.wiki/images/Armadillo_face.png',
+    hp: 6, hpMax: 12,
+    spawn: 'Badlands, Savanna, Windswept Savanna',
+    drops: ['Armadillo Scute (periodically)'],
+    desc: 'A small mob that rolls into a protective ball when it detects a nearby threat such as a sprinting player, undead mob, or spider. Armadillo Scutes are used to craft Wolf Armor, giving tamed wolves powerful protection. Added in Java 1.21.'
+  },
+  // ── NEUTRAL ──────────────────────────────────────────────
+  {
+    id: 'polar_bear', name: 'Polar Bear', cat: 'neutral', emoji: '🐻‍❄️',
+    img: 'https://minecraft.wiki/images/Polar_Bear_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'Snowy Plains, Ice Spikes, Frozen Ocean, Grove',
+    drops: ['Raw Cod (0–2)', 'Raw Salmon (0–2)'],
+    desc: 'Polar bears are neutral unless they have cubs nearby, in which case they become fiercely hostile. Mother bears with cubs are among the most dangerous neutral mobs at close range. They can swim and are well-camouflaged in snowy biomes.'
+  },
+  {
+    id: 'enderman', name: 'Enderman', cat: 'neutral', emoji: '🕴️',
+    img: 'https://minecraft.wiki/images/Enderman_face.png',
+    hp: 20, hpMax: 40,
+    spawn: 'Overworld (low light), The End, Nether Wastes',
+    drops: ['Ender Pearl (0–1)'],
+    desc: 'Tall, dark beings from The End who become hostile when you look directly at their eyes or attack them. They can teleport, pick up blocks, and are immune to projectiles. They take damage from water and rain. Ender Pearls are crucial for accessing The End. They speak a distorted language.'
+  },
+  {
+    id: 'zombified_piglin', name: 'Zombified Piglin', cat: 'neutral', emoji: '🧟',
+    img: 'https://minecraft.wiki/images/Zombified_Piglin_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Nether (Crimson Forest, Nether Wastes, Portal edges)',
+    drops: ['Gold Nugget (0–1)', 'Rotten Flesh (0–1)', 'Gold Sword (rare)'],
+    desc: 'Undead piglins that roam the Nether in packs. Neutral until attacked — then the ENTIRE nearby group becomes hostile simultaneously. They can cross into the Overworld through portals, and Pigs struck by lightning transform into them. They were formerly called Zombie Pigmen.'
+  },
+  {
+    id: 'piglin', name: 'Piglin', cat: 'neutral', emoji: '🐷',
+    img: 'https://minecraft.wiki/images/Piglin_face.png',
+    hp: 8, hpMax: 16,
+    spawn: 'Nether (Crimson Forest, Bastion Remnant)',
+    drops: ['Gold Nugget (0–1)', 'Cooked Porkchop', 'Various Nether items'],
+    desc: 'Piglins are neutral to players wearing gold armor. They can be bartered with — throw a gold ingot and receive a random Nether item in return. They become zombified within 15 seconds of entering the Overworld. They attack Wither Skeletons and Hoglins on sight.'
+  },
+  {
+    id: 'spider', name: 'Spider', cat: 'neutral', emoji: '🕷️',
+    img: 'https://minecraft.wiki/images/Spider_face.png',
+    hp: 8, hpMax: 16,
+    spawn: 'Overworld (low light, dark areas)',
+    drops: ['String (0–2)', 'Spider Eye (1/3 chance)'],
+    desc: 'Large arthropods that can climb walls and fit through 1×1 gaps. Neutral in daylight (light level 12+), hostile at night. Spider Jockeys — spiders ridden by Skeletons — have a 1% spawn chance. Spider Eyes brew Potions of Poison. They can spawn with random status effects in Hard mode.'
+  },
+  {
+    id: 'cave_spider', name: 'Cave Spider', cat: 'neutral', emoji: '🕸️',
+    img: 'https://minecraft.wiki/images/Cave_Spider_face.png',
+    hp: 6, hpMax: 12,
+    spawn: 'Mineshafts (spawner)',
+    drops: ['String (0–2)', 'Spider Eye (1/3 chance)'],
+    desc: 'Smaller and faster than regular spiders, cave spiders can fit through half-block gaps and deal Poison on their bite in Normal/Hard mode. They only spawn from spawners in mineshafts. Despite being smaller, their venom makes them more dangerous than regular spiders in hard mode.'
+  },
+  // ── HOSTILE ──────────────────────────────────────────────
+  {
+    id: 'zombie', name: 'Zombie', cat: 'hostile', emoji: '🧟',
+    img: 'https://minecraft.wiki/images/Zombie_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Overworld (light level 0)',
+    drops: ['Rotten Flesh (0–2)', 'Carrot/Potato/Iron Ingot (rare)'],
+    desc: 'The quintessential Minecraft mob. Zombies shamble toward players and villagers, breaking down doors on Hard difficulty. They burn in sunlight unless wearing a helmet. Zombie sieges can attack villages at night. They can pick up dropped items and come in Husk, Drowned, and Baby variants.'
+  },
+  {
+    id: 'skeleton', name: 'Skeleton', cat: 'hostile', emoji: '💀',
+    img: 'https://minecraft.wiki/images/Skeleton_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Overworld (light level 0)',
+    drops: ['Bone (0–2)', 'Arrow (0–2)', 'Bow (rare)'],
+    desc: 'Ranged undead archers that strafe while keeping distance. Skeletons predict player movement when shooting. They burn in sunlight. Can be equipped with armor and weapons. Stray is a cold-biome variant, and Bogged is a mushroom-shrouded variant added in 1.21. Skeleton Horse is a rare mount.'
+  },
+  {
+    id: 'creeper', name: 'Creeper', cat: 'hostile', emoji: '💚',
+    img: 'https://minecraft.wiki/images/Creeper_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Overworld (light level 0)',
+    drops: ['Gunpowder (0–2)', 'Music Disc (when killed by Skeleton)'],
+    desc: 'The iconic silent explosive mob. Creepers sneak up and detonate (1.5s fuse) when within 3 blocks. Charged Creepers (struck by lightning) have a doubled blast radius and cause mob head drops. Cats scare them away. Their accidental creation was a game-defining moment in Minecraft\'s history.'
+  },
+  {
+    id: 'witch', name: 'Witch', cat: 'hostile', emoji: '🧙',
+    img: 'https://minecraft.wiki/images/Witch_face.png',
+    hp: 13, hpMax: 26,
+    spawn: 'Overworld (light level 0), Swamp Huts',
+    drops: ['Glowstone Dust', 'Sugar', 'Redstone', 'Spider Eye', 'Gunpowder', 'Stick', 'Glass Bottle', 'Potion'],
+    desc: 'Potion-throwing mages that heal themselves with Instant Health and resist fire with Fire Resistance potions. They throw Slowness, Poison, Weakness, and Harming potions at players. Witches always spawn in swamp huts and can also spawn when lightning strikes a villager within 4 blocks.'
+  },
+  {
+    id: 'slime', name: 'Slime', cat: 'hostile', emoji: '🟩',
+    img: 'https://minecraft.wiki/images/Slime_face.png',
+    hp: 4, hpMax: 8,
+    spawn: 'Swamps (night), Slime Chunks (below y=40)',
+    drops: ['Slimeball (1–4, large/medium only)'],
+    desc: 'Cube-shaped mobs that split into 2 smaller versions when killed, down to a minimum tiny size. Slimeballs are crafted into sticky pistons, leads, and magma cream. Slime chunks are fixed grid-based locations in every world. Swamp slimes only spawn on full moon nights.'
+  },
+  {
+    id: 'magma_cube', name: 'Magma Cube', cat: 'hostile', emoji: '🔶',
+    img: 'https://minecraft.wiki/images/Magma_Cube_face.png',
+    hp: 4, hpMax: 8,
+    spawn: 'Nether (Basalt Deltas, Nether Fortress, Magma Cube spawners)',
+    drops: ['Magma Cream (1–4, large/medium)'],
+    desc: 'The Nether equivalent of Slimes. They spring forward and split into smaller cubes when killed. Fire and lava deal no damage to them. Magma Cream, crafted from Slimeballs + Blaze Powder, is essential for brewing Fire Resistance potions. Large ones deal significant damage.'
+  },
+  {
+    id: 'blaze', name: 'Blaze', cat: 'hostile', emoji: '🔥',
+    img: 'https://minecraft.wiki/images/Blaze_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Nether Fortress (spawner)',
+    drops: ['Blaze Rod (0–1)'],
+    desc: 'Floating fire entities that launch volleys of fireballs. Blaze Rods are essential — they power brewing stands and (combined with Ender Pearls) craft Eyes of Ender needed to reach the End. Snowballs deal 3 damage to Blazes. They emit light and spin faster as they charge up to attack.'
+  },
+  {
+    id: 'ghast', name: 'Ghast', cat: 'hostile', emoji: '👻',
+    img: 'https://minecraft.wiki/images/Ghast_face.png',
+    hp: 5, hpMax: 10,
+    spawn: 'Nether (all biomes, open areas)',
+    drops: ['Gunpowder (0–2)', 'Ghast Tear (0–1)'],
+    desc: 'Massive 4×4 block floating jellyfish that scream and shoot explosive fireballs. Their fireballs can be deflected back by hitting them (even with fists). Ghast Tears are used in brewing Potions of Regeneration. Despite their size, they have only 5 HP, making them surprisingly easy to kill if you can reach them.'
+  },
+  {
+    id: 'drowned', name: 'Drowned', cat: 'hostile', emoji: '🌊',
+    img: 'https://minecraft.wiki/images/Drowned_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Ocean, Rivers, Water (Zombies that drown)',
+    drops: ['Rotten Flesh (0–2)', 'Copper Ingot (rare)', 'Trident (rare, 8.5%)'],
+    desc: 'Aquatic zombie variants that hunt players underwater. Some carry tridents, making them the only source of this weapon in survival. They walk on land at night and swim back to water at day. Trident Drowned can throw their weapon at range. They can convert Zombies that drown.'
+  },
+  {
+    id: 'husk', name: 'Husk', cat: 'hostile', emoji: '🏜️',
+    img: 'https://minecraft.wiki/images/Husk_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Desert biome (light level 0)',
+    drops: ['Rotten Flesh (0–2)', 'Sand (occasional)'],
+    desc: 'Desert variant of the Zombie with a dusty, decomposed appearance. Unlike regular zombies, Husks do NOT burn in sunlight, making them a persistent daytime threat in deserts. Their attacks inflict the Hunger status effect. They convert into Zombies when submerged in water long enough.'
+  },
+  {
+    id: 'stray', name: 'Stray', cat: 'hostile', emoji: '❄️',
+    img: 'https://minecraft.wiki/images/Stray_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Frozen Ocean, Frozen River, Ice Plains, Snowy Slopes (light level 0)',
+    drops: ['Bone (0–2)', 'Arrow of Slowness (0–1)'],
+    desc: 'A cold-variant skeleton wrapped in icy rags, found exclusively in frozen biomes. Strays fire arrows tipped with Slowness, making escape difficult. They function exactly like regular skeletons in other respects, burning in sunlight and following the same AI. Added in the Frostburn update.'
+  },
+  {
+    id: 'phantom', name: 'Phantom', cat: 'hostile', emoji: '🦇',
+    img: 'https://minecraft.wiki/images/Phantom_face.png',
+    hp: 10, hpMax: 20,
+    spawn: 'Overworld sky (after player skips 3+ nights without sleeping)',
+    drops: ['Phantom Membrane (0–1)'],
+    desc: 'Flying undead that swoop at sleep-deprived players. They spawn in groups after a player hasn\'t slept for 3 in-game days. Phantom Membranes repair Elytra and brew Potions of Slow Falling. Cats scare Phantoms away. They burn in daylight and disperse when the player sleeps.'
+  },
+  {
+    id: 'silverfish', name: 'Silverfish', cat: 'hostile', emoji: '🪲',
+    img: 'https://minecraft.wiki/images/Silverfish_face.png',
+    hp: 4, hpMax: 8,
+    spawn: 'Strongholds (Infested Blocks), Extreme Hills',
+    drops: [],
+    desc: 'Tiny arthropods that hide inside Infested Blocks — stone, cobblestone, and stone bricks that look identical to normal blocks. Breaking an Infested Block releases a Silverfish, which will alert nearby ones. The Silverfish room in Strongholds can swarm players unexpectedly during End Portal discovery.'
+  },
+  {
+    id: 'endermite', name: 'Endermite', cat: 'hostile', emoji: '🔮',
+    img: 'https://minecraft.wiki/images/Endermite_face.png',
+    hp: 4, hpMax: 8,
+    spawn: 'Teleportation of Endermen or throwing Ender Pearls (5% chance)',
+    drops: [],
+    desc: 'Tiny purple arthropods that spawn rarely when throwing Ender Pearls. They are hated by Endermen, who will prioritize attacking them — useful for Enderman XP farms. Endermites despawn within 2 minutes unless named with a Name Tag. The smallest hostile mob in the game.'
+  },
+  {
+    id: 'vindicator', name: 'Vindicator', cat: 'hostile', emoji: '🪓',
+    img: 'https://minecraft.wiki/images/Vindicator_face.png',
+    hp: 12, hpMax: 24,
+    spawn: 'Woodland Mansion, Raids',
+    drops: ['Emerald (0–1)', 'Iron Axe (rare)'],
+    desc: 'Illager warriors armed with iron axes that deal massive melee damage. Named "Johnny" via Name Tag, they become hostile to ALL mobs except Illagers and Ghasts. They are the most dangerous non-boss Raid enemies in the game, capable of one-shotting under-geared players.'
+  },
+  {
+    id: 'evoker', name: 'Evoker', cat: 'hostile', emoji: '🪄',
+    img: 'https://minecraft.wiki/images/Evoker_face.png',
+    hp: 12, hpMax: 24,
+    spawn: 'Woodland Mansion, Raids (Wave 5+)',
+    drops: ['Totem of Undying (1)', 'Emerald (0–1)'],
+    desc: 'Powerful Illager mage that summons Vexes and creates fang attacks in lines. The only source of the Totem of Undying, a one-use life-saving item. Evokers are among the most dangerous overworld mobs — they can summon Vex swarms and cast Fang attacks simultaneously during Raids.'
+  },
+  {
+    id: 'vex', name: 'Vex', cat: 'hostile', emoji: '👺',
+    img: 'https://minecraft.wiki/images/Vex_face.png',
+    hp: 7, hpMax: 14,
+    spawn: 'Summoned by Evoker',
+    drops: [],
+    desc: 'Tiny winged demons summoned in groups of 3 by Evokers. Vexes phase through blocks, walls, and terrain to attack. They glow red and begin taking damage after 30–119 seconds, eventually killing themselves. Their ability to fly through solid blocks makes them uniquely dangerous in enclosed spaces.'
+  },
+  {
+    id: 'pillager', name: 'Pillager', cat: 'hostile', emoji: '🏹',
+    img: 'https://minecraft.wiki/images/Pillager_face.png',
+    hp: 12, hpMax: 24,
+    spawn: 'Pillager Outpost, Raids, Patrol',
+    drops: ['Arrow (0–2)', 'Crossbow (rare)'],
+    desc: 'Crossbow-wielding Illagers that roam the world in patrols and guard Outposts. Killing an Outpost captain gives the player the Bad Omen effect, triggering a Village Raid on entry. They fire rapidly from range and can be identified by their dark-brimmed hats (captains).'
+  },
+  {
+    id: 'ravager', name: 'Ravager', cat: 'hostile', emoji: '🦏',
+    img: 'https://minecraft.wiki/images/Ravager_face.png',
+    hp: 50, hpMax: 100,
+    spawn: 'Raids (Wave 3+)',
+    drops: ['Saddle (1)'],
+    desc: 'A massive, armored beast that charges and destroys crops and blocks. Ravagers are raid-exclusive — among the toughest Overworld mobs with 100 HP. They can be ridden by Pillagers, Vindicators, or Evokers during a raid. Evoker Fang attacks stun them briefly.'
+  },
+  {
+    id: 'guardian', name: 'Guardian', cat: 'hostile', emoji: '🔵',
+    img: 'https://minecraft.wiki/images/Guardian_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'Ocean Monument',
+    drops: ['Prismarine Shard (0–2)', 'Prismarine Crystal (0–1)', 'Raw Fish (0–1)'],
+    desc: 'Thorny aquatic enemies that guard Ocean Monuments. They fire laser beams that charge up over several seconds, dealing high damage. Their spines deal contact damage. They are the primary source of Prismarine, Sea Lanterns, and Sponge rooms within Ocean Monuments.'
+  },
+  {
+    id: 'elder_guardian', name: 'Elder Guardian', cat: 'boss', emoji: '👁️',
+    img: 'https://minecraft.wiki/images/Elder_Guardian_face.png',
+    hp: 40, hpMax: 80,
+    spawn: 'Ocean Monument (3 per structure)',
+    drops: ['Sponge (1)', 'Prismarine Shard (0–2)', 'Wet Sponge', 'Fish'],
+    desc: 'A massive, ancient Guardian — the "mini-boss" of the Ocean Monument. Three Elder Guardians guard each monument. They inflict Mining Fatigue III on nearby players, preventing them from mining through the structure. Defeating all three is required to properly clear an Ocean Monument for use as a base.'
+  },
+  {
+    id: 'shulker', name: 'Shulker', cat: 'hostile', emoji: '🟪',
+    img: 'https://minecraft.wiki/images/Shulker_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'End Cities',
+    drops: ['Shulker Shell (0–1)'],
+    desc: 'Shell-covered mobs that hide in blocks and fire homing projectiles that inflict Levitation. Two Shulker Shells craft the invaluable Shulker Box — a portable chest that keeps its contents when broken. They are exclusively found in End Cities, guarding Elytra and End Ship loot.'
+  },
+  {
+    id: 'hoglin', name: 'Hoglin', cat: 'hostile', emoji: '🐗',
+    img: 'https://minecraft.wiki/images/Hoglin_face.png',
+    hp: 20, hpMax: 40,
+    spawn: 'Nether (Crimson Forest)',
+    drops: ['Raw Porkchop (2–4)', 'Leather (0–1)'],
+    desc: 'Aggressive Nether boars that knock players high into the air. They are the only renewable food source in the Nether. They are repelled by Warped Fungi and Nether Portals. Transformed into Zoglins when entering the Overworld. Baby Hoglins are passive and can be bred with Crimson Fungi.'
+  },
+  {
+    id: 'zoglin', name: 'Zoglin', cat: 'hostile', emoji: '🧟',
+    img: 'https://minecraft.wiki/images/Zoglin_face.png',
+    hp: 20, hpMax: 40,
+    spawn: 'Overworld/End (when Hoglin enters from Nether)',
+    drops: ['Rotten Flesh (1–3)'],
+    desc: 'A zombified Hoglin formed when a Hoglin enters the Overworld or End. Zoglins are immune to fire, do not retreat from anything, and attack every mob they see — except Creepers. They are permanently aggressive and cannot be calmed. Even Piglins flee from Zoglins in the Nether.'
+  },
+  {
+    id: 'warden', name: 'Warden', cat: 'boss', emoji: '💚',
+    img: 'https://minecraft.wiki/images/Warden_face.png',
+    hp: 250, hpMax: 500,
+    spawn: 'Deep Dark (summoned by 3 Sculk Shriek activations)',
+    drops: ['Sculk Catalyst (1)'],
+    desc: 'The strongest mob in Minecraft. Completely blind, the Warden detects players through vibrations, smell, and sound. It has 500 HP and deals 22.5 damage (one-hit killing most players), shoots a Sonic Boom that ignores armor and shields, and is immune to knockback. The recommended strategy is to AVOID it, not fight it. It patrols the Deep Dark sniffing out any disturbance.'
+  },
+  {
+    id: 'breeze', name: 'Breeze', cat: 'hostile', emoji: '💨',
+    img: 'https://minecraft.wiki/images/Breeze_face.png',
+    hp: 15, hpMax: 30,
+    spawn: 'Trial Chambers',
+    drops: ['Breeze Rod (1–2)'],
+    desc: 'An agile wind-based mob exclusive to Trial Chambers, added in Java 1.21. It leaps around and fires Wind Charges — projectiles that knock back players and interact with trial spawners, levers, buttons, and trapdoors. Breeze Rods craft the new Mace weapon and Wind Charges. Arrows and tridents do no damage to it.'
+  },
+  {
+    id: 'bogged', name: 'Bogged', cat: 'hostile', emoji: '🍄',
+    img: 'https://minecraft.wiki/images/Bogged_face.png',
+    hp: 8, hpMax: 16,
+    spawn: 'Swamp, Mangrove Swamp, Trial Chambers',
+    drops: ['Bone (0–1)', 'Arrow of Poison (0–1)', 'Mushroom (Brown/Red)'],
+    desc: 'A skeleton variant covered in mushrooms and moss. Added in Java 1.21, Bogged skeletons fire Poison-tipped arrows, making them more dangerous than regular Skeletons. They can be sheared to remove their mushrooms. Found in swamps and Trial Chambers.'
+  },
+  {
+    id: 'creaking', name: 'Creaking', cat: 'hostile', emoji: '🌳',
+    img: 'https://minecraft.wiki/images/Creaking_face.png',
+    hp: 1, hpMax: 20,
+    spawn: 'Pale Garden (night, spawned by Creaking Heart block)',
+    drops: [],
+    desc: 'A ghostly wooden mob added in Java 1.21.4 (The Garden Awakens). Creakings are spectral constructs linked to a Creaking Heart block in a nearby Pale Oak tree. They only move when NOT being directly observed — they freeze when a player looks at them. Destroying the linked Creaking Heart block destroys the Creaking.'
+  },
+  // ── BOSSES ────────────────────────────────────────────────
+  {
+    id: 'ender_dragon', name: 'Ender Dragon', cat: 'boss', emoji: '🐉',
+    img: 'https://minecraft.wiki/images/Ender_Dragon_face.png',
+    hp: 100, hpMax: 200,
+    spawn: 'The End (spawns on first entry)',
+    drops: ['Dragon Egg (first kill only)', '12,000 XP', 'End Portal activation'],
+    desc: 'The final boss of Minecraft. The Ender Dragon circles the End while being healed by End Crystals atop obsidian pillars. Destroy all crystals, then deal damage during landing phases. On death, she drops 12,000 XP (most in the game), the Dragon Egg, and opens the exit portal. She can be re-summoned with 4 End Crystals for a rematch.'
+  },
+  {
+    id: 'wither', name: 'Wither', cat: 'boss', emoji: '💀',
+    img: 'https://minecraft.wiki/images/Wither_face.png',
+    hp: 150, hpMax: 300,
+    spawn: 'Player-summoned (4 Soul Sand + 3 Wither Skulls)',
+    drops: ['Nether Star (1)'],
+    desc: 'A three-headed, player-summoned boss of destruction. The Wither fires explosive skulls, inflicts the Wither effect (which turns the health bar black), and creates massive explosions. At half health, it gains a shield blocking projectiles and charges. The Nether Star it drops is used to craft Beacons — the most powerful utility block in the game.'
+  },
+];
+
+// ════════════════════════════════════════════════════════════
+//  IMAGE FALLBACK MANAGEMENT
+// ════════════════════════════════════════════════════════════
+function imgOrEmoji(mob) {
+  return `
+    <img
+      src="${mob.img}"
+      alt="${mob.name}"
+      loading="lazy"
+      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+    >
+    <span class="mob-emoji-fallback" style="display:none;">${mob.emoji}</span>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════
+//  RENDER GRID
+// ════════════════════════════════════════════════════════════
+const grid = document.getElementById('mobGrid');
+const noResults = document.getElementById('noResults');
+const statsText = document.getElementById('statsText');
+const searchInput = document.getElementById('searchInput');
+const filterBtns = document.querySelectorAll('.filter-btn');
+
+let currentCat = 'all';
+let currentSearch = '';
+
+function renderCards() {
+  // Remove old cards
+  grid.querySelectorAll('.mob-card').forEach(c => c.remove());
+
+  const searchLower = currentSearch.toLowerCase();
+  let visible = 0;
+
+  MOBS.forEach(mob => {
+    const matchCat = currentCat === 'all' || mob.cat === currentCat;
+    const matchSearch = mob.name.toLowerCase().includes(searchLower) ||
+                        mob.cat.toLowerCase().includes(searchLower) ||
+                        mob.spawn.toLowerCase().includes(searchLower);
+
+    const card = document.createElement('div');
+    card.className = 'mob-card';
+    card.dataset.cat = mob.cat;
+    card.dataset.id = mob.id;
+    card.innerHTML = `
+      <span class="cat-dot"></span>
+      <div class="mob-img-wrap">${imgOrEmoji(mob)}</div>
+      <div class="mob-name">${mob.name}</div>
+    `;
+    card.addEventListener('click', () => openModal(mob));
+
+    if (!matchCat || !matchSearch) {
+      card.classList.add('hidden');
+    } else {
+      visible++;
+    }
+
+    grid.insertBefore(card, noResults);
+  });
+
+  noResults.style.display = visible === 0 ? 'block' : 'none';
+
+  // Stats
+  const total = MOBS.length;
+  const cats = { passive: 0, neutral: 0, hostile: 0, boss: 0 };
+  MOBS.forEach(m => cats[m.cat]++);
+  statsText.textContent = `${visible} of ${total} mobs · Passive: ${cats.passive} · Neutral: ${cats.neutral} · Hostile: ${cats.hostile} · Bosses: ${cats.boss}`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  MODAL
+// ════════════════════════════════════════════════════════════
+const overlay = document.getElementById('modalOverlay');
+const modalName = document.getElementById('modalName');
+const modalCat = document.getElementById('modalCat');
+const modalImg = document.getElementById('modalImg');
+const modalBody = document.getElementById('modalBody');
+const modalClose = document.getElementById('modalClose');
+
+function hpPercent(mob) {
+  return Math.round((mob.hp / 50) * 100);
+}
+
+function catLabel(cat) {
+  return cat.charAt(0).toUpperCase() + cat.slice(1);
+}
+
+function openModal(mob) {
+  modalName.textContent = mob.name;
+  modalCat.className = `cat-badge ${mob.cat}`;
+  modalCat.textContent = catLabel(mob.cat);
+  modalImg.innerHTML = imgOrEmoji(mob);
+
+  const dropsHtml = mob.drops.length > 0
+    ? mob.drops.map(d => `<span class="drop-tag">🎁 ${d}</span>`).join('')
+    : '<span class="drop-tag">Nothing</span>';
+
+  const hpPct = Math.min(100, Math.round((mob.hp / 50) * 100));
+
+  modalBody.innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-block">
+        <div class="stat-label">❤ Health</div>
+        <div class="stat-value">${mob.hp * 2} HP (${mob.hp} hearts)</div>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar" style="width:${hpPct}%"></div>
+        </div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">📍 Spawn Location</div>
+        <div class="stat-value">${mob.spawn}</div>
+      </div>
+    </div>
+    <div class="section-title">DROPS</div>
+    <div class="drops-list">${dropsHtml}</div>
+    <div class="section-title">BEHAVIOR</div>
+    <div class="section-text">${mob.desc}</div>
+  `;
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ════════════════════════════════════════════════════════════
+//  FILTERS & SEARCH
+// ════════════════════════════════════════════════════════════
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCat = btn.dataset.cat;
+    renderCards();
+  });
+});
+
+searchInput.addEventListener('input', () => {
+  currentSearch = searchInput.value.trim();
+  renderCards();
+});
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+renderCards();
+</script>
+</body>
+</html>
