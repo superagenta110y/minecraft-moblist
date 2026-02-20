@@ -1006,7 +1006,7 @@ const ITEMS = [
     desc:'Obtained from cows, horses, donkeys, mules, llamas, rabbits, and hoglins. Used to craft leather armor — the first tier of protection — and item frames, books, and saddle components.',
     usedFor:['Leather Armor','Book','Item Frame'],
     craftedFrom:[],
-    droppedBy:['cow','horse','donkey','mule','llama','hoglin','rabbit'] },
+    droppedBy:['cow','horse','donkey','mule','llama','hoglin','rabbit','fox'] },
 
   { id:'raw_beef', name:'Raw Beef', img:'items/raw_beef.png', emoji:'🥩', category:'food',
     desc:'Dropped by cows and mooshrooms. Cooks into Steak, the most filling regular food in the game.',
@@ -1198,7 +1198,7 @@ const ITEMS = [
     desc:'Dropped by skeletons and pillagers. Crafted from flint, stick, and feather. Used as ammunition for bows and crossbows.',
     usedFor:['Bow Ammo','Crossbow Ammo'],
     craftedFrom:[{itemId:'feather',qty:1},{itemId:'flint',qty:1}],
-    droppedBy:['skeleton','pillager'] },
+    droppedBy:['skeleton','stray','pillager'] },
 
   { id:'bow', name:'Bow', img:'items/bow.png', emoji:'🏹', category:'combat',
     desc:'Rarely dropped by skeletons. Crafted from sticks and string. The primary ranged weapon for most of the game.',
@@ -1306,7 +1306,7 @@ const ITEMS = [
     desc:'Dropped by Vindicators and Evokers. The Villager trading currency. Mined from Emerald Ore in mountain biomes.',
     usedFor:['Villager Trading','Beacon Payment','Decorative Block'],
     craftedFrom:[],
-    droppedBy:['vindicator','evoker'] },
+    droppedBy:['vindicator','evoker','pillager'] },
 
   { id:'iron_axe', name:'Iron Axe', img:'items/iron_axe.png', emoji:'🪓', category:'combat',
     desc:'Rarely dropped by Vindicators. Crafted from iron ingots and sticks. Deals high damage, especially critical hits.',
@@ -1421,6 +1421,36 @@ const ITEMS = [
     usedFor:['Baked Potato','Pig/Rabbit Breeding'],
     craftedFrom:[],
     droppedBy:['zombie'] },
+
+  { id:'gold_ingot', name:'Gold Ingot', img:'items/gold_ingot.png', emoji:'🟡', category:'material',
+    desc:'Rarely dropped by Zombified Piglins (in golden form). Smelted from Gold Ore or crafted from 9 Gold Nuggets. Used for golden tools, powered rails, clocks, and Nether Portal frames. Also accepted by Piglins as trade currency.',
+    usedFor:['Golden Tools','Powered Rail','Clock','Piglin Bartering','Nether Portal Frames'],
+    craftedFrom:[{itemId:'gold_nugget',qty:9}],
+    droppedBy:['zombified_piglin'] },
+
+  { id:'eye_of_ender', name:'Eye of Ender', img:'items/eye_of_ender.png', emoji:'🟣', category:'rare',
+    desc:'Crafted from an Ender Pearl and Blaze Powder. Thrown to locate the nearest Stronghold, slowly flying in that direction. 12 Eyes of Ender are needed to activate the End Portal hidden in the Stronghold.',
+    usedFor:['End Portal Activation','Stronghold Navigation'],
+    craftedFrom:[{itemId:'ender_pearl',qty:1},{itemId:'blaze_powder',qty:1}],
+    droppedBy:[] },
+
+  { id:'fermented_spider_eye', name:'Fermented Spider Eye', img:'items/fermented_spider_eye.png', emoji:'🕷️', category:'material',
+    desc:'Crafted from a Spider Eye, Sugar, and Brown Mushroom. Used as a base ingredient for many negative-effect potions — it corrupts existing potions into their harmful counterparts (Potion of Weakness, Harming, Blindness, Slowness).',
+    usedFor:['Potion of Weakness','Potion of Harming','Potion of Blindness','Potion of Slowness'],
+    craftedFrom:[{itemId:'spider_eye',qty:1},{itemId:'sugar',qty:1},{itemId:'mushroom',qty:1}],
+    droppedBy:[] },
+
+  { id:'shulker_box', name:'Shulker Box', img:'items/shulker_box.png', emoji:'🟪', category:'rare',
+    desc:'Crafted from 2 Shulker Shells and a Chest. The most valuable storage item in the game — keeps its contents when broken, making it a portable chest. Essential for End exploration and item transport. Comes in 16 colors.',
+    usedFor:['Portable Storage','Item Transport','End Looting'],
+    craftedFrom:[{itemId:'shulker_shell',qty:2}],
+    droppedBy:[] },
+
+  { id:'beacon', name:'Beacon', img:'items/beacon.png', emoji:'⭐', category:'rare',
+    desc:'Crafted from a Nether Star, 3 Obsidian, and 5 Glass. The most powerful utility block in the game — emits a beam of light and grants area-wide status effects (Speed, Haste, Resistance, Jump Boost, Strength, Regeneration) to nearby players.',
+    usedFor:['Area Status Effects','Haste/Speed/Strength Aura','Base Defense'],
+    craftedFrom:[{itemId:'nether_star',qty:1},{itemId:'obsidian',qty:3},{itemId:'glass',qty:5}],
+    droppedBy:[] },
 ];
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1632,6 +1662,13 @@ const LOCATIONS = [
     structures:['End City','End Ship','Obsidian Pillars','Exit Portal'],
     mobs:['ender_dragon','enderman','shulker','zoglin'],
     resources:['End Stone','Obsidian','Chorus Fruit','End Rod','Elytra (End Ship)'] },
+
+  { id:'nether_fortress', name:'Nether Fortress', dimension:'nether', emoji:'🏰',
+    theme:{ bgColor:'#1a0800', bgGradient:'radial-gradient(ellipse at top, #220c00 0%, #1a0800 70%)', accentColor:'#ff7043', cardBg:'#200a00' },
+    desc:'Massive dark structures made of Nether Brick that loom above the lava seas. The only place Blazes and Wither Skeletons naturally spawn. Nether Wart grows in its staircases. An essential early Nether destination for progression.',
+    structures:['Blaze Spawner','Nether Wart Farm','Treasure Chests'],
+    mobs:['blaze','zombified_piglin'],
+    resources:['Nether Brick','Nether Wart','Soul Sand','Magma Block'] },
 ];
 
 // ════════════════════════════════════════════════════════════════════════════
