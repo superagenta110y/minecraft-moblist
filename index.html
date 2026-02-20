@@ -1006,6 +1006,7 @@ const ITEMS = [
   { id:'leather', name:'Leather', img:'items/leather.png', emoji:'🟫', category:'material',
     desc:'Obtained from cows, horses, donkeys, mules, llamas, rabbits, and hoglins. Used to craft leather armor — the first tier of protection — and item frames, books, and saddle components.',
     usedFor:['Leather Armor','Book','Item Frame'],
+    usedForIds:['leather_armor','book'],
     craftedFrom:[],
     droppedBy:['cow','horse','donkey','mule','llama','hoglin','rabbit','fox'] },
 
@@ -1024,6 +1025,7 @@ const ITEMS = [
   { id:'wool', name:'Wool', img:'items/white_wool.png', emoji:'🟨', category:'material',
     desc:'Dropped by sheep or obtained by shearing them. Available in 16 colors. Used to craft beds, carpets, and more.',
     usedFor:['Bed','Carpet','Painting','Banner'],
+    usedForIds:['bed'],
     craftedFrom:[],
     droppedBy:['sheep'] },
 
@@ -1036,6 +1038,7 @@ const ITEMS = [
   { id:'feather', name:'Feather', img:'items/feather.png', emoji:'🪶', category:'material',
     desc:'Dropped by chickens and parrots. Essential for crafting arrows and quills (book and quill).',
     usedFor:['Arrow','Book and Quill'],
+    usedForIds:['arrow','book_and_quill'],
     craftedFrom:[],
     droppedBy:['chicken','parrot'] },
 
@@ -1066,24 +1069,28 @@ const ITEMS = [
   { id:'rabbits_foot', name:"Rabbit's Foot", img:"items/rabbit's_foot.png", emoji:'🦶', category:'rare',
     desc:'A rare 10% drop from rabbits. Used in brewing the Potion of Leaping.',
     usedFor:['Potion of Leaping'],
+    usedForIds:['potion_of_leaping'],
     craftedFrom:[],
     droppedBy:['rabbit'] },
 
   { id:'string', name:'String', img:'items/string.png', emoji:'🧵', category:'material',
     desc:'Dropped by spiders, cave spiders, cats, and striders. Used to craft bows, crossbows, fishing rods, wool, leads, and tripwire hooks.',
     usedFor:['Bow','Crossbow','Fishing Rod','Wool','Lead','Tripwire Hook'],
+    usedForIds:['','','','','lead',''],
     craftedFrom:[],
     droppedBy:['cat','strider','spider','cave_spider'] },
 
   { id:'ink_sac', name:'Ink Sac', img:'items/ink_sac.png', emoji:'⬛', category:'material',
     desc:'Dropped by squids. Used as black dye for wool, glass, and writing in books.',
     usedFor:['Black Dye','Book and Quill (writing)'],
+    usedForIds:['','book_and_quill'],
     craftedFrom:[],
     droppedBy:['squid'] },
 
   { id:'glow_ink_sac', name:'Glow Ink Sac', img:'items/glow_ink_sac.png', emoji:'✨', category:'rare',
     desc:'Dropped by Glow Squids. Makes signs glow and creates Glow Item Frames.',
     usedFor:['Glow Sign Text','Glow Item Frame'],
+    usedForIds:['','glow_item_frame'],
     craftedFrom:[],
     droppedBy:['glow_squid'] },
 
@@ -1108,6 +1115,7 @@ const ITEMS = [
   { id:'scute', name:'Scute', img:'items/turtle_scute.png', emoji:'🐢', category:'rare',
     desc:'Dropped by baby turtles when they grow up. 5 scutes craft a Turtle Shell helmet that grants Water Breathing.',
     usedFor:['Turtle Shell Helmet','Potion of the Turtle Master'],
+    usedForIds:['turtle_shell',''],
     craftedFrom:[],
     droppedBy:['turtle'] },
 
@@ -1120,6 +1128,7 @@ const ITEMS = [
   { id:'slimeball', name:'Slimeball', img:'items/slimeball.png', emoji:'🟩', category:'material',
     desc:'Dropped by Slimes and rarely by pandas. Essential for crafting sticky pistons, leads, slime blocks, and magma cream.',
     usedFor:['Sticky Piston','Lead','Slime Block','Magma Cream'],
+    usedForIds:['sticky_piston','lead','','magma_cream'],
     craftedFrom:[],
     droppedBy:['slime','panda'] },
 
@@ -1144,6 +1153,7 @@ const ITEMS = [
   { id:'pufferfish', name:'Pufferfish', img:'items/pufferfish.png', emoji:'🐡', category:'material',
     desc:'Dropped by pufferfish mobs. Essential for brewing Potions of Water Breathing.',
     usedFor:['Potion of Water Breathing'],
+    usedForIds:['potion_of_water_breathing'],
     craftedFrom:[],
     droppedBy:['pufferfish'] },
 
@@ -1162,6 +1172,7 @@ const ITEMS = [
   { id:'armadillo_scute', name:'Armadillo Scute', img:'items/armadillo_scute.png', emoji:'🪲', category:'material',
     desc:'Dropped periodically by armadillos. Used to craft Wolf Armor, giving tamed wolves protection.',
     usedFor:['Wolf Armor'],
+    usedForIds:['wolf_armor'],
     craftedFrom:[],
     droppedBy:['armadillo'] },
 
@@ -1186,6 +1197,7 @@ const ITEMS = [
   { id:'spider_eye', name:'Spider Eye', img:'items/spider_eye.png', emoji:'🕷️', category:'material',
     desc:'Dropped by spiders, cave spiders, and witches. Used to brew Potions of Poison. Combined with sugar and mushroom to craft Fermented Spider Eye.',
     usedFor:['Potion of Poison','Fermented Spider Eye'],
+    usedForIds:['potion_of_poison','fermented_spider_eye'],
     craftedFrom:[],
     droppedBy:['spider','cave_spider','witch'] },
 
@@ -1210,6 +1222,7 @@ const ITEMS = [
   { id:'gunpowder', name:'Gunpowder', img:'items/gunpowder.png', emoji:'💥', category:'material',
     desc:'Dropped by Creepers, Ghasts, and Witches. Used to craft TNT, Fire Charges, and Firework Rockets.',
     usedFor:['TNT','Fire Charge','Firework Rocket'],
+    usedForIds:['tnt','fire_charge','firework_rocket'],
     craftedFrom:[],
     droppedBy:['creeper','ghast','witch'] },
 
@@ -1252,12 +1265,14 @@ const ITEMS = [
   { id:'magma_cream', name:'Magma Cream', img:'items/magma_cream.png', emoji:'🔶', category:'material',
     desc:'Dropped by Magma Cubes. Essential for brewing Fire Resistance potions. Can also be crafted from Slimeball + Blaze Powder.',
     usedFor:['Potion of Fire Resistance'],
+    usedForIds:['potion_of_fire_resistance'],
     craftedFrom:[{itemId:'slimeball',qty:1},{itemId:'blaze_powder',qty:1}],
     droppedBy:['magma_cube'] },
 
   { id:'blaze_rod', name:'Blaze Rod', img:'items/blaze_rod.png', emoji:'🔥', category:'rare',
     desc:'Dropped by Blazes. Powers Brewing Stands. Combined with Ender Pearls to craft Eyes of Ender to locate and enter The End.',
     usedFor:['Brewing Stand','Eye of Ender','Blaze Powder','Fire Charge'],
+    usedForIds:['','eye_of_ender','','fire_charge'],
     craftedFrom:[],
     droppedBy:['blaze'] },
 
@@ -1270,6 +1285,7 @@ const ITEMS = [
   { id:'ghast_tear', name:'Ghast Tear', img:'items/ghast_tear.png', emoji:'💧', category:'rare',
     desc:'Dropped by Ghasts. Used in brewing Potions of Regeneration. One of the harder Nether items to obtain due to the Ghast spawning over lava.',
     usedFor:['Potion of Regeneration','End Crystal'],
+    usedForIds:['potion_of_regeneration',''],
     craftedFrom:[],
     droppedBy:['ghast'] },
 
@@ -1300,6 +1316,7 @@ const ITEMS = [
   { id:'phantom_membrane', name:'Phantom Membrane', img:'items/phantom_membrane.png', emoji:'🦇', category:'rare',
     desc:'Dropped by Phantoms. Used to repair Elytra and brew Potions of Slow Falling.',
     usedFor:['Elytra Repair','Potion of Slow Falling'],
+    usedForIds:['elytra','potion_of_slow_falling'],
     craftedFrom:[],
     droppedBy:['phantom'] },
 
@@ -1336,12 +1353,14 @@ const ITEMS = [
   { id:'prismarine_shard', name:'Prismarine Shard', img:'items/prismarine_shard.png', emoji:'🔵', category:'material',
     desc:'Dropped by Guardians and Elder Guardians. Used to craft Prismarine blocks, Sea Lanterns, and Prismarine bricks.',
     usedFor:['Prismarine Block','Sea Lantern','Prismarine Bricks'],
+    usedForIds:['','sea_lantern',''],
     craftedFrom:[],
     droppedBy:['guardian','elder_guardian'] },
 
   { id:'prismarine_crystal', name:'Prismarine Crystal', img:'items/prismarine_crystals.png', emoji:'💎', category:'material',
     desc:'Dropped by Guardians. Used to craft Sea Lanterns (the brightest light source).',
     usedFor:['Sea Lantern'],
+    usedForIds:['sea_lantern'],
     craftedFrom:[],
     droppedBy:['guardian'] },
 
@@ -1354,6 +1373,7 @@ const ITEMS = [
   { id:'shulker_shell', name:'Shulker Shell', img:'items/shulker_shell.png', emoji:'🟪', category:'rare',
     desc:'Dropped by Shulkers. Two Shulker Shells craft a Shulker Box — a portable chest that keeps its contents when broken. Invaluable for end-game item management.',
     usedFor:['Shulker Box'],
+    usedForIds:['shulker_box'],
     craftedFrom:[],
     droppedBy:['shulker'] },
 
@@ -1366,6 +1386,7 @@ const ITEMS = [
   { id:'breeze_rod', name:'Breeze Rod', img:'items/breeze_rod.png', emoji:'💨', category:'rare',
     desc:'Dropped by Breezes. Used to craft the Mace — a powerful new weapon — and Wind Charges.',
     usedFor:['Mace Weapon','Wind Charge'],
+    usedForIds:['mace','wind_charge'],
     craftedFrom:[],
     droppedBy:['breeze'] },
 
@@ -1452,6 +1473,102 @@ const ITEMS = [
     usedFor:['Area Status Effects','Haste/Speed/Strength Aura','Base Defense'],
     craftedFrom:[{itemId:'nether_star',qty:1},{itemId:'obsidian',qty:3},{itemId:'glass',qty:5}],
     droppedBy:[] },
+
+  // ── COOKED FOODS ──
+  { id:'steak', name:'Steak', img:'items/steak.png', emoji:'🥩', category:'food',
+    desc:'Cooked beef. Restores 8 hunger — one of the best food items.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'raw_beef',qty:1,method:'smelt'}], droppedBy:['cow','mooshroom'] },
+  { id:'cooked_porkchop', name:'Cooked Porkchop', img:'items/cooked_porkchop.png', emoji:'🍖', category:'food',
+    desc:'Cooked pork. Restores 8 hunger.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'raw_porkchop',qty:1,method:'smelt'}], droppedBy:['pig','hoglin'] },
+  { id:'cooked_chicken', name:'Cooked Chicken', img:'items/cooked_chicken.png', emoji:'🍗', category:'food',
+    desc:'Cooked chicken. Restores 6 hunger.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'raw_chicken',qty:1,method:'smelt'}], droppedBy:['chicken'] },
+  { id:'cooked_mutton', name:'Cooked Mutton', img:'items/cooked_mutton.png', emoji:'🍖', category:'food',
+    desc:'Cooked mutton. Restores 6 hunger.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'raw_mutton',qty:1,method:'smelt'}], droppedBy:['sheep'] },
+  { id:'cooked_rabbit', name:'Cooked Rabbit', img:'items/cooked_rabbit.png', emoji:'🍖', category:'food',
+    desc:'Cooked rabbit. Restores 5 hunger. Ingredient in Rabbit Stew.', usedFor:['Rabbit Stew'], usedForIds:['rabbit_stew'],
+    craftedFrom:[{itemId:'raw_rabbit',qty:1,method:'smelt'}], droppedBy:['rabbit'] },
+  { id:'cooked_cod', name:'Cooked Cod', img:'items/cooked_cod.png', emoji:'🐟', category:'food',
+    desc:'Cooked cod. Restores 5 hunger.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'raw_cod',qty:1,method:'smelt'}], droppedBy:['cod','guardian'] },
+  { id:'cooked_salmon', name:'Cooked Salmon', img:'items/cooked_salmon.png', emoji:'🐟', category:'food',
+    desc:'Cooked salmon. Restores 6 hunger — better than cod.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'raw_salmon',qty:1,method:'smelt'}], droppedBy:['salmon'] },
+  { id:'rabbit_stew', name:'Rabbit Stew', img:'items/rabbit_stew.png', emoji:'🍲', category:'food',
+    desc:'The most filling food in Minecraft, restoring 10 hunger.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'cooked_rabbit',qty:1},{itemId:'carrot',qty:1},{itemId:'potato',qty:1}], droppedBy:[] },
+
+  // ── CRAFTED ITEMS ──
+  { id:'tnt', name:'TNT', img:'items/tnt.png', emoji:'💣', category:'combat',
+    desc:'Explodes after being primed. Used for mining and combat.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'gunpowder',qty:5},{itemId:'sand',qty:4}], droppedBy:[] },
+  { id:'leather_armor', name:'Leather Armor', img:'items/leather_armor.png', emoji:'🧥', category:'combat',
+    desc:'Basic armor set crafted from leather. Can be dyed any color.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'leather',qty:7}], droppedBy:[] },
+  { id:'book', name:'Book', img:'items/book.png', emoji:'📖', category:'material',
+    desc:'Used to craft bookshelves, enchanting tables, and Book and Quill.', usedFor:['Bookshelf','Enchanting Table','Book and Quill'], usedForIds:['','','book_and_quill'],
+    craftedFrom:[{itemId:'leather',qty:1}], droppedBy:[] },
+  { id:'book_and_quill', name:'Book and Quill', img:'items/book_and_quill.png', emoji:'📝', category:'material',
+    desc:'A writable book. Signed copies can be published and shared.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'book',qty:1},{itemId:'ink_sac',qty:1},{itemId:'feather',qty:1}], droppedBy:[] },
+  { id:'bed', name:'Bed', img:'items/bed.png', emoji:'🛏️', category:'material',
+    desc:'Set your spawn point and skip the night. Explodes in the Nether and End.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'wool',qty:3}], droppedBy:[] },
+  { id:'lead', name:'Lead', img:'items/lead.png', emoji:'🪢', category:'material',
+    desc:'Leash for mobs. Also used to tie mobs to fences.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'string',qty:4},{itemId:'slimeball',qty:1}], droppedBy:[] },
+  { id:'sticky_piston', name:'Sticky Piston', img:'items/sticky_piston.png', emoji:'⬜', category:'material',
+    desc:'A piston that pulls blocks back when retracted. Essential for redstone contraptions.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'slimeball',qty:1}], droppedBy:[] },
+  { id:'fire_charge', name:'Fire Charge', img:'items/fire_charge.png', emoji:'🔥', category:'combat',
+    desc:'Acts like a ghast fireball. Can light portals and campfires.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'gunpowder',qty:1},{itemId:'blaze_rod',qty:1}], droppedBy:[] },
+  { id:'firework_rocket', name:'Firework Rocket', img:'items/firework_rocket.png', emoji:'🎆', category:'material',
+    desc:'Used for Elytra propulsion and celebrations.', usedFor:['Elytra Boost'], usedForIds:[],
+    craftedFrom:[{itemId:'gunpowder',qty:1}], droppedBy:[] },
+  { id:'glow_item_frame', name:'Glow Item Frame', img:'items/glow_item_frame.png', emoji:'🖼️', category:'material',
+    desc:'An item frame that glows in the dark. Made with Glow Ink Sac.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'glow_ink_sac',qty:1}], droppedBy:[] },
+  { id:'sea_lantern', name:'Sea Lantern', img:'items/sea_lantern.png', emoji:'💡', category:'material',
+    desc:'A bright underwater light source found in Ocean Monuments.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'prismarine_crystal',qty:5},{itemId:'prismarine_shard',qty:4}], droppedBy:[] },
+  { id:'turtle_shell', name:'Turtle Shell', img:'items/turtle_shell.png', emoji:'🐢', category:'combat',
+    desc:'A helmet granting Water Breathing. Used to brew Potions of the Turtle Master.', usedFor:['Potion of the Turtle Master'], usedForIds:[],
+    craftedFrom:[{itemId:'scute',qty:5}], droppedBy:[] },
+  { id:'wolf_armor', name:'Wolf Armor', img:'items/wolf_armor.png', emoji:'🐺', category:'combat',
+    desc:'Armor for tamed wolves crafted from Armadillo Scutes.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'armadillo_scute',qty:6}], droppedBy:[] },
+  { id:'wind_charge', name:'Wind Charge', img:'items/wind_charge.png', emoji:'💨', category:'combat',
+    desc:'A throwable projectile that knocks back entities and interacts with redstone.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'breeze_rod',qty:1}], droppedBy:['breeze'] },
+  { id:'mace', name:'Mace', img:'items/mace.png', emoji:'🔨', category:'combat',
+    desc:'A powerful new weapon that deals massive damage after falling. Uses Breeze Rods.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'breeze_rod',qty:1}], droppedBy:[] },
+  { id:'elytra', name:'Elytra', img:'items/elytra.png', emoji:'🪂', category:'rare',
+    desc:'Wings found in End Ships that allow gliding. Repaired with Phantom Membranes.', usedFor:[], usedForIds:[],
+    craftedFrom:[], droppedBy:[] },
+
+  // ── POTIONS ──
+  { id:'potion_of_regeneration', name:'Potion of Regeneration', img:'items/potion_of_regeneration.png', emoji:'🧪', category:'material',
+    desc:'Slowly restores health over time. Brewed with Ghast Tear.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'ghast_tear',qty:1}], droppedBy:[] },
+  { id:'potion_of_fire_resistance', name:'Potion of Fire Resistance', img:'items/potion_of_fire_resistance.png', emoji:'🔥', category:'material',
+    desc:'Grants immunity to fire and lava. Essential for Nether exploration.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'magma_cream',qty:1}], droppedBy:[] },
+  { id:'potion_of_leaping', name:'Potion of Leaping', img:'items/potion_of_leaping.png', emoji:'🐇', category:'material',
+    desc:"Increases jump height. Brewed with Rabbit's Foot.", usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'rabbits_foot',qty:1}], droppedBy:[] },
+  { id:'potion_of_water_breathing', name:'Potion of Water Breathing', img:'items/potion_of_water_breathing.png', emoji:'🫧', category:'material',
+    desc:'Allows breathing underwater. Brewed with Pufferfish.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'pufferfish',qty:1}], droppedBy:[] },
+  { id:'potion_of_poison', name:'Potion of Poison', img:'items/potion_of_poison.png', emoji:'☠️', category:'combat',
+    desc:'Inflicts poison damage. Brewed with Spider Eye.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'spider_eye',qty:1}], droppedBy:[] },
+  { id:'potion_of_slow_falling', name:'Potion of Slow Falling', img:'items/potion_of_slow_falling.png', emoji:'🍃', category:'material',
+    desc:'Slows falling speed and negates fall damage. Brewed with Phantom Membrane.', usedFor:[], usedForIds:[],
+    craftedFrom:[{itemId:'phantom_membrane',qty:1}], droppedBy:[] },
 ];
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1997,8 +2114,14 @@ function openItemModal(item, fromHistory) {
 
     // UsedFor
     const usedForHtml = item.usedFor.length > 0
-      ? item.usedFor.map(u => `<span class="chip">${u}</span>`).join('')
-      : '<span class="chip">Decorative</span>';
+      ? item.usedFor.map((u, i) => {
+          const linkId = item.usedForIds && item.usedForIds[i];
+          const targetItem = linkId && ITEMS.find(x => x.id === linkId);
+          return targetItem
+            ? `<span class="chip clickable ingredient-chip" data-itemid="${targetItem.id}">${u}</span>`
+            : `<span class="chip">${u}</span>`;
+        }).join('')
+      : '<span class="chip">Decorative / Direct Use</span>';
 
     // CraftedFrom
     const craftedFromHtml = item.craftedFrom.length > 0
