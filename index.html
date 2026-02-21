@@ -556,6 +556,38 @@
     .stat-grid { grid-template-columns: 1fr; }
   }
 
+  /* ── STRUCTURE CARDS ── */
+  .structure-card:hover { border-color: var(--yellow); box-shadow: 0 8px 24px rgba(255,193,7,0.2); }
+
+  .rarity-badge {
+    display: inline-block; font-size: 6px; padding: 3px 8px;
+    border-radius: 2px; border: 1px solid;
+    letter-spacing: 1px; text-transform: uppercase;
+    font-family: 'Press Start 2P', monospace;
+  }
+  .rarity-common   { color: #888; border-color: #444; background: rgba(255,255,255,0.04); }
+  .rarity-uncommon { color: var(--blue); border-color: var(--blue); background: rgba(33,150,243,0.1); }
+  .rarity-rare     { color: var(--purple); border-color: var(--purple); background: rgba(156,39,176,0.12); }
+  .rarity-unique   { color: var(--yellow); border-color: var(--yellow); background: rgba(255,193,7,0.1); }
+
+  /* structure rarity filter buttons */
+  .filter-btn[data-filter="common"]   { border-color: #555; }
+  .filter-btn[data-filter="common"].active   { background: #1a1a1a; border-color: #888; color: #ccc; }
+  .filter-btn[data-filter="uncommon"] { border-color: var(--blue); }
+  .filter-btn[data-filter="uncommon"].active { background: #001a3a; border-color: var(--blue); color: var(--blue); text-shadow: 0 0 8px var(--blue); }
+
+  /* ── VIDEO EMBED ── */
+  .video-embed { margin-top: 8px; border-radius: 4px; overflow: hidden; border: 2px solid var(--border-stone); }
+  .video-embed iframe { display: block; }
+
+  /* ── CONCEPT CHIP ── */
+  .chip.concept-chip { color: var(--purple); border-color: rgba(156,39,176,0.4); cursor: pointer; }
+  .chip.concept-chip:hover { border-color: var(--purple); background: rgba(156,39,176,0.08); transform: translateY(-1px); }
+
+  /* ── STRUCTURE CHIP (in location / mob modals) ── */
+  .chip.struct-chip { color: var(--yellow); border-color: rgba(255,193,7,0.4); cursor: pointer; }
+  .chip.struct-chip:hover { border-color: var(--yellow); background: rgba(255,193,7,0.08); transform: translateY(-1px); }
+
   /* ── BOSS GLOW ── */
   @keyframes bossGlow {
     0%,100% { box-shadow: 0 0 10px rgba(156,39,176,0.3); }
@@ -584,12 +616,13 @@
 ══════════════════════════════════════════════════════════════ -->
 <header>
   <h1>⚔ MINECRAFT ENCYCLOPEDIA ⚔</h1>
-  <p class="subtitle">JAVA EDITION 1.21+ · MOBS · ITEMS · LOCATIONS</p>
+  <p class="subtitle">JAVA EDITION 1.21+ · MOBS · ITEMS · LOCATIONS · STRUCTURES</p>
 
   <div class="tab-nav">
     <button class="tab-btn active" data-tab="mobs">⚔ MOBS</button>
     <button class="tab-btn" data-tab="items">🎁 ITEMS</button>
     <button class="tab-btn" data-tab="locations">🗺 LOCATIONS</button>
+    <button class="tab-btn" data-tab="structures">🏰 STRUCTURES</button>
   </div>
 
   <!-- MOBS controls -->
@@ -632,6 +665,22 @@
       <button class="filter-btn" data-filter="end">🌌 THE END</button>
     </div>
   </div>
+
+  <!-- STRUCTURES controls -->
+  <div id="structureControls" class="controls" style="display:none">
+    <div class="search-wrapper">
+      <input type="text" class="search-input" id="structureSearch" placeholder="Search structures..." autocomplete="off" spellcheck="false">
+    </div>
+    <div class="filter-buttons" id="structureFilters">
+      <button class="filter-btn active" data-filter="all">ALL</button>
+      <button class="filter-btn" data-filter="overworld">🌍 OVERWORLD</button>
+      <button class="filter-btn" data-filter="nether">🔥 NETHER</button>
+      <button class="filter-btn" data-filter="end">🌌 THE END</button>
+      <button class="filter-btn" data-filter="common">◆ COMMON</button>
+      <button class="filter-btn" data-filter="uncommon">◆ UNCOMMON</button>
+      <button class="filter-btn" data-filter="rare">◆ RARE</button>
+    </div>
+  </div>
 </header>
 
 <div class="stats-bar"><span id="statsText">Loading...</span></div>
@@ -659,6 +708,13 @@
   <div id="tabLocations" class="tab-pane">
     <div class="entity-grid" id="locationGrid">
       <div class="no-results" id="locationNoResults">No locations found.</div>
+    </div>
+  </div>
+
+  <!-- STRUCTURES TAB -->
+  <div id="tabStructures" class="tab-pane">
+    <div class="entity-grid" id="structureGrid">
+      <div class="no-results" id="structureNoResults">No structures found.</div>
     </div>
   </div>
 
@@ -1790,6 +1846,183 @@ const LOCATIONS = [
 ];
 
 // ════════════════════════════════════════════════════════════════════════════
+//  STRUCTURES DATA
+// ════════════════════════════════════════════════════════════════════════════
+const STRUCTURES = [
+  { id:'village', name:'Village', img:'structures/village.png', emoji:'🏘️',
+    dimension:'overworld', rarity:'common',
+    biomes:['Plains','Desert','Savanna','Taiga','Snowy Plains'],
+    desc:'Naturally generated settlements inhabited by Villagers. Contains houses, farms, wells, and various profession buildings. Trading with villagers is one of the most powerful economic systems in the game.',
+    loot:['Emerald','Food','Tools','Armor','Enchanted Books'],
+    lootIds:['emerald'],
+    mobs:['zombie','pillager','witch'] },
+
+  { id:'ruined_portal', name:'Ruined Portal', img:'structures/ruined_portal.png', emoji:'🔮',
+    dimension:'overworld', rarity:'common',
+    biomes:['Any (Overworld & Nether)'],
+    desc:'Damaged Nether Portals scattered across the Overworld and Nether. Each contains a chest with golden items and obsidian. They can be repaired into a functional Nether Portal with obsidian and flint & steel.',
+    loot:['Golden Items','Obsidian','Crying Obsidian','Gold Block'],
+    lootIds:['gold_ingot'],
+    mobs:[] },
+
+  { id:'pillager_outpost', name:'Pillager Outpost', img:'structures/pillager_outpost.png', emoji:'🗼',
+    dimension:'overworld', rarity:'uncommon',
+    biomes:['Plains','Desert','Savanna','Taiga','Snowy Plains','Mountains'],
+    desc:'Tall dark-oak watchtowers permanently garrisoned by Pillagers. A caged Allay is sometimes found nearby. Killing the outpost captain grants Bad Omen, which triggers a Village Raid on entry.',
+    loot:['Crossbow','Arrow','Emerald','Iron Ingot'],
+    lootIds:['crossbow','arrow','emerald','iron_ingot'],
+    mobs:['pillager','allay'] },
+
+  { id:'stronghold', name:'Stronghold', img:'structures/stronghold.png', emoji:'🏰',
+    dimension:'overworld', rarity:'rare',
+    biomes:['Underground (any biome)'],
+    desc:'Massive underground fortresses containing the End Portal — the only way to reach The End. Only 3 strongholds generate per world in concentric rings. Navigate using Eyes of Ender thrown above ground. Contains libraries, prison cells, and a portal room.',
+    loot:['Ender Pearl','Enchanted Books','Golden Apple','End Portal Frame'],
+    lootIds:['ender_pearl','eye_of_ender'],
+    mobs:['silverfish','zombie','skeleton'] },
+
+  { id:'ocean_monument', name:'Ocean Monument', img:'structures/ocean_monument.png', emoji:'🌊',
+    dimension:'overworld', rarity:'uncommon',
+    biomes:['Deep Ocean','Ocean'],
+    desc:'Enormous prismarine structures submerged in ocean depths. Protected by swarms of Guardians and three Elder Guardians that inflict Mining Fatigue III. The central treasure chamber hides a cache of gold blocks. Sponges found here can drain flooded rooms.',
+    loot:['Sponge','Prismarine','Gold Block','Sea Lantern'],
+    lootIds:['sponge','prismarine_shard','prismarine_crystal','sea_lantern'],
+    mobs:['guardian','elder_guardian'] },
+
+  { id:'woodland_mansion', name:'Woodland Mansion', img:'structures/woodland_mansion.png', emoji:'🏚️',
+    dimension:'overworld', rarity:'rare',
+    biomes:['Dark Forest'],
+    desc:'Enormous three-story mansions deep in Dark Forests, inhabited by Vindicators, Evokers, and caged Allays. Contains dozens of unique rooms including treasure vaults. Locating one requires a Woodland Explorer Map from a cartographer villager.',
+    loot:['Totem of Undying','Enchanted Books','Diamond Gear'],
+    lootIds:['totem_of_undying','emerald'],
+    mobs:['vindicator','evoker','vex','allay'] },
+
+  { id:'nether_fortress', name:'Nether Fortress', img:'structures/nether_fortress.png', emoji:'🏯',
+    dimension:'nether', rarity:'uncommon',
+    biomes:['Nether Wastes','Soul Sand Valley','Any Nether Biome'],
+    desc:'Massive dark structures of Nether Brick sprawling across the Nether. The only natural spawn point for Blazes and Wither Skeletons. Nether Wart grows in the staircase gardens. Essential for progression — Blaze Rods power Brewing Stands and craft Eyes of Ender.',
+    loot:['Blaze Rod','Nether Wart','Saddle','Enchanted Books'],
+    lootIds:['blaze_rod','saddle'],
+    mobs:['blaze','wither_skeleton','zombified_piglin','magma_cube'] },
+
+  { id:'bastion_remnant', name:'Bastion Remnant', img:'structures/bastion_remnant.png', emoji:'🧱',
+    dimension:'nether', rarity:'uncommon',
+    biomes:['Crimson Forest','Nether Wastes','Warped Forest','Soul Sand Valley'],
+    desc:'Enormous ruined Piglin strongholds of blackstone and gilded blackstone. Four variants exist: bridge, hoglin stables, housing units, and treasure room. The treasure vault holds some of the most valuable Nether loot but is heavily guarded by Piglins.',
+    loot:['Netherite Scrap','Ancient Debris','Golden Items','Pigstep Music Disc'],
+    lootIds:['gold_ingot','gold_nugget'],
+    mobs:['piglin','hoglin','zombified_piglin'] },
+
+  { id:'end_city', name:'End City', img:'structures/end_city.png', emoji:'🏙️',
+    dimension:'end', rarity:'uncommon',
+    biomes:['Outer End Islands'],
+    desc:'Tall purple shulker-inhabited towers on the outer End islands, only reachable after defeating the Ender Dragon. End Cities generate with End Ships docked nearby, which always contain an Elytra in an item frame. One of the best late-game loot sources.',
+    loot:['Elytra (End Ship)','Diamond Gear','Shulker Shell'],
+    lootIds:['elytra','shulker_shell'],
+    mobs:['shulker','enderman'] },
+
+  { id:'ancient_city', name:'Ancient City', img:'structures/ancient_city.png', emoji:'🏛️',
+    dimension:'overworld', rarity:'rare',
+    biomes:['Deep Dark (y≈-52)'],
+    desc:'Vast underground cities of sculk and deepslate found only in the Deep Dark biome. The most dangerous structure in the game — the Warden patrols here. Contains reinforced deepslate (uncraftable), echo shards, and the Swift Sneak enchantment exclusive to this structure.',
+    loot:['Echo Shard','Disc Fragment (5)','Reinforced Deepslate','Swift Sneak Books'],
+    lootIds:['sculk_catalyst'],
+    mobs:['warden'] },
+
+  { id:'trial_chambers', name:'Trial Chambers', img:'structures/trial_chambers.png', emoji:'⚔️',
+    dimension:'overworld', rarity:'uncommon',
+    biomes:['Underground (Dripstone & Overworld Caves)'],
+    desc:'Procedurally generated underground challenge arenas added in Java 1.21. Contains Trial Spawners that release waves of mobs and dispense loot. Ominous Trial Spawners trigger harder variants with better rewards. The Mace and Heavy Core are exclusive to this structure.',
+    loot:['Breeze Rod','Wind Charge','Mace','Heavy Core','Ominous Bottles'],
+    lootIds:['breeze_rod','wind_charge','mace'],
+    mobs:['breeze','bogged','silverfish'] },
+
+  { id:'mineshaft', name:'Abandoned Mineshaft', img:'structures/mineshaft.png', emoji:'⛏️',
+    dimension:'overworld', rarity:'common',
+    biomes:['Underground (any)','Badlands (surface)'],
+    desc:'Sprawling networks of wooden tunnels and minecart tracks underground. Cave Spider spawners are common here. In Badlands biomes, mineshafts often break the surface exposing gold at all heights. Chest minecarts scattered throughout contain useful early-game loot.',
+    loot:['Rail','Torch','Chest Minecart','String','Gold (Badlands)'],
+    lootIds:['string','iron_ingot'],
+    mobs:['cave_spider'] },
+
+  { id:'desert_temple', name:'Desert Temple', img:'structures/desert_temple.png', emoji:'🏛️',
+    dimension:'overworld', rarity:'uncommon',
+    biomes:['Desert'],
+    desc:'Large sandstone pyramids buried in desert biomes. The main chamber contains four treasure chests below a colored wool floor, protected by a TNT pressure plate trap beneath the blue wool block. Always look before you leap — the trap kills instantly.',
+    loot:['Enchanted Books','Diamond','Emerald','Gold','Saddle','Bones'],
+    lootIds:['emerald'],
+    mobs:[] },
+
+  { id:'jungle_temple', name:'Jungle Temple', img:'structures/jungle_temple.png', emoji:'🌿',
+    dimension:'overworld', rarity:'uncommon',
+    biomes:['Jungle','Bamboo Jungle'],
+    desc:'Crumbling mossy cobblestone temples hidden in dense jungles. Features two tripwire trap corridors and a lever puzzle. Solving the lever combination without triggering the dispensers grants access to the primary loot chest behind a hidden door.',
+    loot:['Enchanted Books','Diamond','Emerald','Saddle'],
+    lootIds:['emerald'],
+    mobs:[] },
+
+  { id:'igloo', name:'Igloo', img:'structures/igloo.png', emoji:'🏠',
+    dimension:'overworld', rarity:'uncommon',
+    biomes:['Snowy Plains','Snowy Taiga','Snowy Slopes'],
+    desc:'Small snow-block structures in cold biomes. Some igloos have a secret trapdoor beneath a carpet leading to a basement laboratory: a zombie villager and villager are caged together, and a Golden Apple sits ready — use it to cure the zombie villager into a valuable discounted trader.',
+    loot:['Golden Apple','Brewing Stand','Coal','Wheat'],
+    lootIds:[],
+    mobs:['zombie','villager'] },
+
+  { id:'shipwreck', name:'Shipwreck', img:'structures/shipwreck.png', emoji:'⛵',
+    dimension:'overworld', rarity:'common',
+    biomes:['Ocean','Beach'],
+    desc:'Sunken or beached wooden ships in multiple orientations. Contain up to 3 chests: supply (food, tools), treasure (emeralds, iron, gold), and map chest. The buried treasure map from the map chest leads to a Heart of the Sea — the key ingredient for a Conduit.',
+    loot:['Buried Treasure Map','Emerald','Iron Ingot','Paper','Wheat','Carrots'],
+    lootIds:['emerald','iron_ingot','carrot'],
+    mobs:['drowned'] },
+
+  { id:'buried_treasure', name:'Buried Treasure', img:'structures/buried_treasure.png', emoji:'💎',
+    dimension:'overworld', rarity:'common',
+    biomes:['Beach'],
+    desc:'Single hidden chests buried under sand or gravel on beaches. Located using Buried Treasure Maps from Shipwrecks or by following Dolphins. Always contains a Heart of the Sea — the sole crafting ingredient for the Conduit. The chest is always at chunk coordinate x=9, z=9.',
+    loot:['Heart of the Sea','Diamond','Iron Ingot','Gold Ingot','Cooked Fish','TNT'],
+    lootIds:['iron_ingot'],
+    mobs:[] },
+
+  { id:'end_ship', name:'End Ship', img:'structures/end_ship.png', emoji:'🚢',
+    dimension:'end', rarity:'uncommon',
+    biomes:['Outer End Islands (docked above End Cities)'],
+    desc:'Flying vessels docked above End Cities. Every End Ship contains exactly one Elytra displayed in an item frame — the only legitimate survival source of this iconic gliding item. Also features a Dragon Head trophy on the bow and a Brewing Stand with Instant Health potions.',
+    loot:['Elytra','Dragon Head','Brewing Stand','Potion of Instant Health'],
+    lootIds:['elytra'],
+    mobs:['shulker'] },
+];
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CONCEPTS DATA
+// ════════════════════════════════════════════════════════════════════════════
+const CONCEPTS = [
+  { id:'ranged_combat', name:'Ranged Combat', emoji:'🏹',
+    desc:'Attacking enemies from a distance using Bows, Crossbows, or thrown projectiles like Ender Pearls and Tridents.' },
+  { id:'firework_launching', name:'Firework Launching', emoji:'🎆',
+    desc:'Using Firework Rockets for celebrations or to propel Elytra flight.' },
+  { id:'elytra_boost', name:'Elytra Boost', emoji:'🪂',
+    desc:'Using Firework Rockets while wearing Elytra to propel yourself forward mid-glide.' },
+  { id:'brewing', name:'Brewing', emoji:'🧪',
+    desc:'Using a Brewing Stand to combine ingredients with Water Bottles to create potions.' },
+  { id:'enchanting', name:'Enchanting', emoji:'✨',
+    desc:'Applying magical upgrades to tools, weapons, and armor using an Enchanting Table or Anvil.' },
+  { id:'taming', name:'Taming', emoji:'🐾',
+    desc:'Using specific items to tame wild mobs (wolves with bones, cats with fish, horses with patience).' },
+  { id:'trading', name:'Villager Trading', emoji:'🤝',
+    desc:'Exchanging items with Villagers for Emeralds or useful goods. Unlocking higher trade tiers gives better items.' },
+  { id:'beacon', name:'Beacon Power', emoji:'🔆',
+    desc:'A fully powered Beacon grants area-of-effect status effects like Speed, Haste, Resistance, Jump Boost, or Strength.' },
+];
+
+// Concept lookup helper
+function findConcept(str) {
+  const lower = str.toLowerCase();
+  return CONCEPTS.find(c => lower.includes(c.name.toLowerCase()));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 //  STATE & NAVIGATION
 // ════════════════════════════════════════════════════════════════════════════
 let currentTab = 'mobs';
@@ -1820,6 +2053,7 @@ function switchTab(tab, highlightId) {
   document.getElementById('mobControls').style.display = tab === 'mobs' ? '' : 'none';
   document.getElementById('itemControls').style.display = tab === 'items' ? '' : 'none';
   document.getElementById('locationControls').style.display = tab === 'locations' ? '' : 'none';
+  document.getElementById('structureControls').style.display = tab === 'structures' ? '' : 'none';
 
   updateStats();
 
@@ -1829,7 +2063,7 @@ function switchTab(tab, highlightId) {
 }
 
 function highlightCard(tab, id) {
-  const gridId = tab === 'mobs' ? 'mobGrid' : tab === 'items' ? 'itemGrid' : 'locationGrid';
+  const gridId = tab === 'mobs' ? 'mobGrid' : tab === 'items' ? 'itemGrid' : tab === 'structures' ? 'structureGrid' : 'locationGrid';
   const card = document.querySelector(`#${gridId} [data-id="${id}"]`);
   if (card) {
     card.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -1970,6 +2204,52 @@ document.getElementById('locationFilters').querySelectorAll('.filter-btn').forEa
 });
 
 // ════════════════════════════════════════════════════════════════════════════
+//  RENDER STRUCTURE GRID
+// ════════════════════════════════════════════════════════════════════════════
+let structureFilter = 'all', structureSearch = '';
+
+function renderStructures() {
+  const grid = document.getElementById('structureGrid');
+  const noRes = document.getElementById('structureNoResults');
+  grid.querySelectorAll('.entity-card').forEach(c => c.remove());
+  const sl = structureSearch.toLowerCase();
+  let visible = 0;
+
+  STRUCTURES.forEach(struct => {
+    const matchDim = structureFilter === 'all' || struct.dimension === structureFilter || struct.rarity === structureFilter;
+    const matchSearch = struct.name.toLowerCase().includes(sl) || struct.dimension.toLowerCase().includes(sl) || struct.rarity.toLowerCase().includes(sl) || struct.desc.toLowerCase().includes(sl);
+    const card = document.createElement('div');
+    card.className = 'entity-card structure-card';
+    card.dataset.dimension = struct.dimension;
+    card.dataset.rarity = struct.rarity;
+    card.dataset.id = struct.id;
+    card.innerHTML = `
+      <div class="entity-img-wrap">
+        <img src="${struct.img}" alt="${struct.name}" loading="lazy" style="max-width:96px;max-height:96px;object-fit:contain;" onerror="this.style.display='none';this.nextSibling.style.display='block'">
+        <span class="entity-emoji-fallback" style="display:none;font-size:52px">${struct.emoji}</span>
+      </div>
+      <div class="entity-name">${struct.name}</div>
+      <span class="location-dim-badge dim-${struct.dimension}">${struct.dimension.toUpperCase()}</span>
+      <span class="rarity-badge rarity-${struct.rarity}">${struct.rarity.toUpperCase()}</span>`;
+    card.addEventListener('click', () => openStructureModal(struct));
+    if (!matchDim || !matchSearch) card.classList.add('hidden'); else visible++;
+    grid.insertBefore(card, noRes);
+  });
+
+  noRes.style.display = visible === 0 ? 'block' : 'none';
+}
+
+document.getElementById('structureSearch').addEventListener('input', e => { structureSearch = e.target.value.trim(); renderStructures(); });
+document.getElementById('structureFilters').querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('structureFilters').querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    structureFilter = btn.dataset.filter;
+    renderStructures();
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
 //  STATS BAR
 // ════════════════════════════════════════════════════════════════════════════
 function updateStats() {
@@ -1982,6 +2262,11 @@ function updateStats() {
     const cats = {};
     ITEMS.forEach(i => cats[i.category] = (cats[i.category]||0)+1);
     statsText.textContent = `${ITEMS.length} items · Material: ${cats.material||0} · Food: ${cats.food||0} · Combat: ${cats.combat||0} · Rare: ${cats.rare||0}`;
+  } else if (currentTab === 'structures') {
+    const dims = { overworld:0, nether:0, end:0 };
+    const rars = { common:0, uncommon:0, rare:0, unique:0 };
+    STRUCTURES.forEach(s => { dims[s.dimension]=(dims[s.dimension]||0)+1; rars[s.rarity]++; });
+    statsText.textContent = `${STRUCTURES.length} structures · Overworld: ${dims.overworld} · Nether: ${dims.nether} · End: ${dims.end||0} · Common: ${rars.common} · Uncommon: ${rars.uncommon} · Rare: ${rars.rare}`;
   } else {
     const dims = { overworld:0, nether:0, end:0 };
     LOCATIONS.forEach(l => dims[l.dimension]++);
@@ -2033,6 +2318,13 @@ modalBack.addEventListener('click', () => {
 // ════════════════════════════════════════════════════════════════════════════
 //  MOB MODAL
 // ════════════════════════════════════════════════════════════════════════════
+const BOSS_VIDEOS = {
+  'ender_dragon': 'qlSPERNvNyc',
+  'wither':       'epZa74hzCy8',
+  'elder_guardian': 'Y_LZPV-OQVY',
+  'warden':       'ZrORhlKhJDs',
+};
+
 function openMobModal(mob, fromHistory) {
   const render = () => {
     modalName.textContent = mob.name;
@@ -2059,6 +2351,16 @@ function openMobModal(mob, fromHistory) {
         }).join('')
       : '<span class="chip">Nothing</span>';
 
+    // Boss YouTube video
+    const videoId = BOSS_VIDEOS[mob.id];
+    const videoHtml = videoId ? `
+      <div class="section-title">📺 VIDEO</div>
+      <div class="video-embed">
+        <iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}"
+          frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen loading="lazy"></iframe>
+      </div>` : '';
+
     modalBody.innerHTML = `
       <div class="stat-grid">
         <div class="stat-block">
@@ -2075,6 +2377,7 @@ function openMobModal(mob, fromHistory) {
       <div class="chip-list" id="mobDropChips">${dropsHtml}</div>
       <div class="section-title">BEHAVIOR</div>
       <div class="section-text">${mob.desc}</div>
+      ${videoHtml}
     `;
 
     // Bind drop chips
@@ -2112,14 +2415,15 @@ function openItemModal(item, fromHistory) {
     modalCat.textContent = item.category.toUpperCase();
     modalImg.innerHTML = itemImgHtml(item, 80);
 
-    // UsedFor
+    // UsedFor — with concept chip fallback
     const usedForHtml = item.usedFor.length > 0
       ? item.usedFor.map((u, i) => {
           const linkId = item.usedForIds && item.usedForIds[i];
           const targetItem = linkId && ITEMS.find(x => x.id === linkId);
-          return targetItem
-            ? `<span class="chip clickable ingredient-chip" data-itemid="${targetItem.id}">${u}</span>`
-            : `<span class="chip">${u}</span>`;
+          if (targetItem) return `<span class="chip clickable ingredient-chip" data-itemid="${targetItem.id}">${u}</span>`;
+          const concept = findConcept(u);
+          if (concept) return `<span class="chip concept-chip clickable" data-conceptid="${concept.id}">${concept.emoji} ${u}</span>`;
+          return `<span class="chip">${u}</span>`;
         }).join('')
       : '<span class="chip">Decorative / Direct Use</span>';
 
@@ -2173,6 +2477,14 @@ function openItemModal(item, fromHistory) {
       });
     });
 
+    // Bind concept chips
+    modalBody.querySelectorAll('[data-conceptid]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const concept = CONCEPTS.find(c => c.id === chip.dataset.conceptid);
+        if (concept) { pushHistory(render); openConceptModal(concept, true); }
+      });
+    });
+
     // Bind mob thumbnails
     modalBody.querySelectorAll('.mob-thumb[data-mobid]').forEach(thumb => {
       thumb.addEventListener('click', () => {
@@ -2196,9 +2508,19 @@ function openLocationModal(loc, fromHistory) {
     modalCat.textContent = loc.dimension.toUpperCase();
     modalImg.innerHTML = `<div class="modal-entity-emoji">${loc.emoji}</div>`;
 
-    // Structures
+    // Structures — clickable if a matching STRUCTURES entry exists
     const structHtml = loc.structures.length > 0
-      ? loc.structures.map(s => `<span class="chip">${s}</span>`).join('')
+      ? loc.structures.map(s => {
+          const sLow = s.toLowerCase().replace(/\s*\([^)]*\)/g, '').trim();
+          const found = STRUCTURES.find(st =>
+            st.name.toLowerCase() === sLow ||
+            sLow.includes(st.name.toLowerCase()) ||
+            st.name.toLowerCase().includes(sLow)
+          );
+          return found
+            ? `<span class="chip struct-chip clickable" data-structid="${found.id}">${found.emoji} ${s}</span>`
+            : `<span class="chip">${s}</span>`;
+        }).join('')
       : '<span class="chip" style="color:var(--text-dim)">None</span>';
 
     // Mobs as clickable chips
@@ -2231,6 +2553,14 @@ function openLocationModal(loc, fromHistory) {
       <div class="chip-list" id="locResourceChips">${resourcesHtml}</div>
     `;
 
+    // Bind structure chips
+    modalBody.querySelectorAll('[data-structid]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const struct = STRUCTURES.find(s => s.id === chip.dataset.structid);
+        if (struct) { pushHistory(render); openStructureModal(struct, true); }
+      });
+    });
+
     // Bind mob chips
     modalBody.querySelectorAll('[data-mobid]').forEach(chip => {
       chip.addEventListener('click', () => {
@@ -2246,6 +2576,91 @@ function openLocationModal(loc, fromHistory) {
         if (item) { pushHistory(render); openItemModal(item, true); }
       });
     });
+  };
+
+  if (!fromHistory) openModal(render);
+  else render();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  STRUCTURE MODAL
+// ════════════════════════════════════════════════════════════════════════════
+function openStructureModal(struct, fromHistory) {
+  const render = () => {
+    modalName.textContent = struct.name;
+    modalCat.className = 'cat-badge ' + struct.dimension;
+    modalCat.textContent = struct.dimension.toUpperCase();
+    const imgSrc = struct.img;
+    modalImg.innerHTML = `<img src="${imgSrc}" alt="${struct.name}" loading="lazy" style="max-width:120px;max-height:120px;object-fit:contain;image-rendering:pixelated;" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span style="display:none;font-size:80px;line-height:1">${struct.emoji}</span>`;
+
+    const biomesHtml = struct.biomes.map(b => `<span class="chip">${b}</span>`).join('');
+
+    const lootHtml = struct.loot.length > 0
+      ? struct.loot.map((l, i) => {
+          const idItem = struct.lootIds && struct.lootIds[i] ? ITEMS.find(it => it.id === struct.lootIds[i]) : null;
+          const nameItem = ITEMS.find(it => it.name.toLowerCase() === l.toLowerCase());
+          const item = idItem || nameItem;
+          return item
+            ? `<span class="chip clickable" data-itemid="${item.id}" title="View ${item.name}">🎁 ${l}</span>`
+            : `<span class="chip">🎁 ${l}</span>`;
+        }).join('')
+      : '<span class="chip" style="color:var(--text-dim)">No notable loot</span>';
+
+    const mobsHtml = struct.mobs.length > 0
+      ? struct.mobs.map(mid => {
+          const mob = MOBS.find(m => m.id === mid);
+          if (!mob) return `<span class="chip mob-chip">${mid}</span>`;
+          return `<span class="chip mob-chip clickable" data-mobid="${mob.id}">${mob.emoji} ${mob.name}</span>`;
+        }).join('')
+      : '<span class="chip" style="color:var(--text-dim)">No unique mobs</span>';
+
+    modalBody.innerHTML = `
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+        <span class="rarity-badge rarity-${struct.rarity}">${struct.rarity.toUpperCase()}</span>
+        <span class="location-dim-badge dim-${struct.dimension}">${struct.dimension.toUpperCase()}</span>
+      </div>
+      <div class="section-title">BIOMES</div>
+      <div class="chip-list">${biomesHtml}</div>
+      <div class="section-title">DESCRIPTION</div>
+      <div class="section-text">${struct.desc}</div>
+      <div class="section-title">MOBS FOUND HERE</div>
+      <div class="chip-list" id="structMobChips">${mobsHtml}</div>
+      <div class="section-title">LOOT</div>
+      <div class="chip-list" id="structLootChips">${lootHtml}</div>
+    `;
+
+    modalBody.querySelectorAll('[data-mobid]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const mob = MOBS.find(m => m.id === chip.dataset.mobid);
+        if (mob) { pushHistory(render); openMobModal(mob, true); }
+      });
+    });
+    modalBody.querySelectorAll('[data-itemid]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const item = ITEMS.find(i => i.id === chip.dataset.itemid);
+        if (item) { pushHistory(render); openItemModal(item, true); }
+      });
+    });
+  };
+
+  if (!fromHistory) openModal(render);
+  else render();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  CONCEPT MODAL
+// ════════════════════════════════════════════════════════════════════════════
+function openConceptModal(concept, fromHistory) {
+  const render = () => {
+    modalName.textContent = concept.name;
+    modalCat.className = 'cat-badge';
+    modalCat.style.cssText = 'color:var(--purple);border-color:var(--purple);background:rgba(156,39,176,0.15)';
+    modalCat.textContent = 'CONCEPT';
+    modalImg.innerHTML = `<div class="modal-entity-emoji">${concept.emoji}</div>`;
+    modalBody.innerHTML = `
+      <div class="section-title">WHAT IS THIS?</div>
+      <div class="section-text">${concept.desc}</div>
+    `;
   };
 
   if (!fromHistory) openModal(render);
@@ -2344,6 +2759,7 @@ document.addEventListener('click', e => {
 renderMobs();
 renderItems();
 renderLocations();
+renderStructures();
 updateStats();
 </script>
 </body>
