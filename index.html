@@ -339,6 +339,50 @@
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
 
+  .modal-entity-img.item-focus {
+    width: 220px; height: 220px;
+    perspective: 900px;
+  }
+
+  .item-3d-stage {
+    width: 160px; height: 160px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: itemSpin 14s linear infinite;
+  }
+
+  .item-3d-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.15);
+    image-rendering: pixelated;
+    overflow: hidden;
+  }
+
+  .item-3d-face img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9));
+  }
+
+  .item-3d-face.front { transform: translateZ(16px); }
+  .item-3d-face.back { transform: rotateY(180deg) translateZ(16px); }
+  .item-3d-face.right { transform: rotateY(90deg) translateZ(16px); }
+  .item-3d-face.left { transform: rotateY(-90deg) translateZ(16px); }
+  .item-3d-face.top { transform: rotateX(90deg) translateZ(16px); }
+  .item-3d-face.bottom { transform: rotateX(-90deg) translateZ(16px); }
+
+  @keyframes itemSpin {
+    0% { transform: rotateX(-10deg) rotateY(0deg); }
+    100% { transform: rotateX(-10deg) rotateY(360deg); }
+  }
+
   .modal-entity-img img {
     max-width: 100%; max-height: 100%;
     object-fit: contain; image-rendering: pixelated;
@@ -1235,6 +1279,7 @@ const ITEMS = [
   { id:'ender_pearl', name:'Ender Pearl', img:'items/ender_pearl.png', emoji:'🟣', category:'combat',
     desc:'Dropped by Endermen. Throw to teleport to the landing location. Combined with Blaze Powder to craft an Eye of Ender, required to locate and activate the End Portal.',
     usedFor:['Eye of Ender','Teleportation'],
+    usedForIds:['eye_of_ender','teleportation'],
     craftedFrom:[],
     droppedBy:['enderman'] },
 
@@ -1285,6 +1330,7 @@ const ITEMS = [
   { id:'glowstone_dust', name:'Glowstone Dust', img:'items/glowstone_dust.png', emoji:'✨', category:'material',
     desc:'Dropped by Witches. Found in Glowstone blocks in the Nether. Used to amplify potions and craft Glowstone blocks.',
     usedFor:['Potion Amplification','Glowstone Block','Spectral Arrow'],
+    usedForIds:['','','spectral_arrow'],
     craftedFrom:[],
     droppedBy:['witch'] },
 
@@ -1564,11 +1610,19 @@ const ITEMS = [
     desc:'Basic armor set crafted from leather. Can be dyed any color.', usedFor:[], usedForIds:[],
     craftedFrom:[{itemId:'leather',qty:7}], droppedBy:[] },
   { id:'book', name:'Book', img:'items/book.png', emoji:'📖', category:'material',
-    desc:'Used to craft bookshelves, enchanting tables, and Book and Quill.', usedFor:['Bookshelf','Enchanting Table','Book and Quill'], usedForIds:['','','book_and_quill'],
+    desc:'Used to craft bookshelves, enchanting tables, and Book and Quill.', usedFor:['Bookshelf','Enchanting Table','Book and Quill'], usedForIds:['bookshelf','','book_and_quill'],
     craftedFrom:[{itemId:'leather',qty:1}], droppedBy:[] },
   { id:'book_and_quill', name:'Book and Quill', img:'items/book_and_quill.png', emoji:'📝', category:'material',
     desc:'A writable book. Signed copies can be published and shared.', usedFor:[], usedForIds:[],
     craftedFrom:[{itemId:'book',qty:1},{itemId:'ink_sac',qty:1},{itemId:'feather',qty:1}], droppedBy:[] },
+
+  { id:'bookshelf', name:'Bookshelf', img:'items/bookshelf.png', emoji:'📚', category:'material',
+    desc:'Used for decoration and to power nearby Enchanting Tables. Crafted from books and wooden planks.', usedFor:['Enchanting Table Boost'], usedForIds:[''],
+    craftedFrom:[{itemId:'book',qty:3}], droppedBy:[] },
+
+  { id:'spectral_arrow', name:'Spectral Arrow', img:'items/spectral_arrow.png', emoji:'✨', category:'combat',
+    desc:'An arrow that outlines hit targets with a glowing effect, making them visible through blocks for a short time.', usedFor:['Ranged Combat'], usedForIds:['ranged_combat'],
+    craftedFrom:[{itemId:'arrow',qty:1},{itemId:'glowstone_dust',qty:1}], droppedBy:[] },
   { id:'bed', name:'Bed', img:'items/bed.png', emoji:'🛏️', category:'material',
     desc:'Set your spawn point and skip the night. Explodes in the Nether and End.', usedFor:[], usedForIds:[],
     craftedFrom:[{itemId:'wool',qty:3}], droppedBy:[] },
@@ -2014,6 +2068,8 @@ const CONCEPTS = [
     desc:'Exchanging items with Villagers for Emeralds or useful goods. Unlocking higher trade tiers gives better items.' },
   { id:'beacon', name:'Beacon Power', emoji:'🔆',
     desc:'A fully powered Beacon grants area-of-effect status effects like Speed, Haste, Resistance, Jump Boost, or Strength.' },
+  { id:'teleportation', name:'Teleportation', emoji:'🌀',
+    desc:'Instantly moving from one location to another with tools like Ender Pearls and commands.' },
 ];
 
 // Concept lookup helper
@@ -2028,6 +2084,7 @@ function findConcept(str) {
 function normalizeLabel(str) {
   return String(str || '')
     .toLowerCase()
+    .replace(/sepctral/g, 'spectral')
     .replace(/\([^)]*\)/g, ' ')
     .replace(/[_-]+/g, ' ')
     .replace(/[^a-z0-9\s]/g, ' ')
@@ -2087,6 +2144,7 @@ function openRelationModal(label, fromHistory) {
     modalCat.className = 'cat-badge';
     modalCat.style.cssText = 'color:var(--orange);border-color:var(--orange);background:rgba(255,152,0,0.12)';
     modalCat.textContent = 'RELATION';
+    modalImg.classList.remove('item-focus');
     modalImg.innerHTML = `<div class="modal-entity-emoji">🔗</div>`;
 
     const related = [];
@@ -2448,6 +2506,7 @@ function openMobModal(mob, fromHistory) {
     modalName.textContent = mob.name;
     modalCat.className = `cat-badge ${mob.cat}`;
     modalCat.textContent = mob.cat.charAt(0).toUpperCase() + mob.cat.slice(1);
+    modalImg.classList.remove('item-focus');
     modalImg.innerHTML = mobImgHtml(mob, 80);
 
     const hpPct = Math.min(100, Math.round((mob.hp / 50) * 100));
@@ -2537,7 +2596,16 @@ function openItemModal(item, fromHistory) {
     modalName.textContent = item.name;
     modalCat.className = `cat-badge ${item.category}`;
     modalCat.textContent = item.category.toUpperCase();
-    modalImg.innerHTML = itemImgHtml(item, 80);
+    modalImg.classList.add('item-focus');
+    modalImg.innerHTML = `
+      <div class="item-3d-stage" aria-label="Rotating 3D item preview">
+        <div class="item-3d-face front"><img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\"entity-emoji-fallback\" style=\"display:block;font-size:74px\">${item.emoji}</span>'"></div>
+        <div class="item-3d-face back"><img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="item-3d-face right"><img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="item-3d-face left"><img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="item-3d-face top"><img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="item-3d-face bottom"><img src="${item.img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'"></div>
+      </div>`;
 
     // UsedFor — with concept chip fallback
     const usedForHtml = item.usedFor.length > 0
@@ -2646,6 +2714,7 @@ function openLocationModal(loc, fromHistory) {
     modalName.textContent = loc.name;
     modalCat.className = `cat-badge ${loc.dimension}`;
     modalCat.textContent = loc.dimension.toUpperCase();
+    modalImg.classList.remove('item-focus');
     modalImg.innerHTML = `<div class="modal-entity-emoji">${loc.emoji}</div>`;
 
     // Structures — clickable if a matching STRUCTURES entry exists
@@ -2737,6 +2806,7 @@ function openStructureModal(struct, fromHistory) {
     modalCat.className = 'cat-badge ' + struct.dimension;
     modalCat.textContent = struct.dimension.toUpperCase();
     const imgSrc = struct.img;
+    modalImg.classList.remove('item-focus');
     modalImg.innerHTML = `<img src="${imgSrc}" alt="${struct.name}" loading="lazy" style="max-width:120px;max-height:120px;object-fit:contain;image-rendering:pixelated;" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span style="display:none;font-size:80px;line-height:1">${struct.emoji}</span>`;
 
     const biomesHtml = struct.biomes.map(b => `<span class="chip">${b}</span>`).join('');
@@ -2808,6 +2878,7 @@ function openConceptModal(concept, fromHistory) {
     modalCat.className = 'cat-badge';
     modalCat.style.cssText = 'color:var(--purple);border-color:var(--purple);background:rgba(156,39,176,0.15)';
     modalCat.textContent = 'CONCEPT';
+    modalImg.classList.remove('item-focus');
     modalImg.innerHTML = `<div class="modal-entity-emoji">${concept.emoji}</div>`;
     modalBody.innerHTML = `
       <div class="section-title">WHAT IS THIS?</div>
