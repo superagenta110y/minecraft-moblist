@@ -2023,6 +2023,124 @@ function findConcept(str) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+//  RELATION RESOLUTION HELPERS
+// ════════════════════════════════════════════════════════════════════════════
+function normalizeLabel(str) {
+  return String(str || '')
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/[_-]+/g, ' ')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function itemIdToLabel(id) {
+  return String(id || '').replace(/[_-]+/g, ' ').replace(/\w/g, c => c.toUpperCase());
+}
+
+function resolveEntityLink(label, explicitId, preferred = ['item','mob','location','structure','concept']) {
+  if (explicitId) {
+    const byId = ITEMS.find(i => i.id === explicitId) || MOBS.find(m => m.id === explicitId) || LOCATIONS.find(l => l.id === explicitId) || STRUCTURES.find(s => s.id === explicitId) || CONCEPTS.find(c => c.id === explicitId);
+    if (byId) {
+      if (ITEMS.includes(byId)) return { type:'item', value: byId };
+      if (MOBS.includes(byId)) return { type:'mob', value: byId };
+      if (LOCATIONS.includes(byId)) return { type:'location', value: byId };
+      if (STRUCTURES.includes(byId)) return { type:'structure', value: byId };
+      return { type:'concept', value: byId };
+    }
+  }
+
+  const n = normalizeLabel(label);
+  const buckets = {
+    item: ITEMS.map(v => ({ type:'item', value:v, n:normalizeLabel(v.name) })),
+    mob: MOBS.map(v => ({ type:'mob', value:v, n:normalizeLabel(v.name) })),
+    location: LOCATIONS.map(v => ({ type:'location', value:v, n:normalizeLabel(v.name) })),
+    structure: STRUCTURES.map(v => ({ type:'structure', value:v, n:normalizeLabel(v.name) })),
+    concept: CONCEPTS.map(v => ({ type:'concept', value:v, n:normalizeLabel(v.name) })),
+  };
+
+  for (const k of preferred) {
+    const exact = buckets[k].find(x => x.n === n);
+    if (exact) return { type: exact.type, value: exact.value };
+  }
+  for (const k of preferred) {
+    const fuzzy = buckets[k].find(x => n && (x.n.includes(n) || n.includes(x.n)));
+    if (fuzzy) return { type: fuzzy.type, value: fuzzy.value };
+  }
+  return null;
+}
+
+function openLinkedEntity(link, render) {
+  if (!link) return;
+  pushHistory(render);
+  if (link.type === 'item') return openItemModal(link.value, true);
+  if (link.type === 'mob') return openMobModal(link.value, true);
+  if (link.type === 'location') return openLocationModal(link.value, true);
+  if (link.type === 'structure') return openStructureModal(link.value, true);
+  if (link.type === 'concept') return openConceptModal(link.value, true);
+}
+
+function openRelationModal(label, fromHistory) {
+  const render = () => {
+    modalName.textContent = label;
+    modalCat.className = 'cat-badge';
+    modalCat.style.cssText = 'color:var(--orange);border-color:var(--orange);background:rgba(255,152,0,0.12)';
+    modalCat.textContent = 'RELATION';
+    modalImg.innerHTML = `<div class="modal-entity-emoji">🔗</div>`;
+
+    const related = [];
+    const n = normalizeLabel(label);
+
+    ITEMS.forEach(i => {
+      const mentions = [i.name, ...(i.usedFor||[]), ...(i.craftedFrom||[]).map(c => c.itemId ? itemIdToLabel(c.itemId) : '')].filter(Boolean);
+      if (mentions.some(m => normalizeLabel(m) === n)) related.push({type:'item',value:i});
+    });
+    MOBS.forEach(m => {
+      const mentions = [m.name, ...(m.drops||[]), m.spawn].filter(Boolean);
+      if (mentions.some(x => normalizeLabel(x) === n)) related.push({type:'mob',value:m});
+    });
+    LOCATIONS.forEach(l => {
+      const mentions = [l.name, ...(l.resources||[]), ...(l.structures||[])].filter(Boolean);
+      if (mentions.some(x => normalizeLabel(x) === n)) related.push({type:'location',value:l});
+    });
+    STRUCTURES.forEach(s => {
+      const mentions = [s.name, ...(s.loot||[]), ...(s.biomes||[])].filter(Boolean);
+      if (mentions.some(x => normalizeLabel(x) === n)) related.push({type:'structure',value:s});
+    });
+
+    const uniq = [];
+    const seen = new Set();
+    related.forEach(r => {
+      const key = `${r.type}:${r.value.id}`;
+      if (!seen.has(key)) { seen.add(key); uniq.push(r); }
+    });
+
+    const chips = uniq.length
+      ? uniq.map(r => `<span class="chip clickable" data-type="${r.type}" data-id="${r.value.id}">${r.value.emoji || '•'} ${r.value.name}</span>`).join('')
+      : '<span class="chip" style="color:var(--text-dim)">No direct entry yet</span>';
+
+    modalBody.innerHTML = `
+      <div class="section-title">DETAIL</div>
+      <div class="section-text">This relationship is now clickable, but it does not yet have a dedicated canonical entity in the encyclopedia dataset.</div>
+      <div class="section-title">RELATED ENTRIES</div>
+      <div class="chip-list">${chips}</div>
+    `;
+
+    modalBody.querySelectorAll('[data-type][data-id]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const t = chip.dataset.type, id = chip.dataset.id;
+        const link = resolveEntityLink('', id);
+        if (link) openLinkedEntity(link, render);
+      });
+    });
+  };
+
+  if (!fromHistory) openModal(render);
+  else render();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 //  STATE & NAVIGATION
 // ════════════════════════════════════════════════════════════════════════════
 let currentTab = 'mobs';
@@ -2347,7 +2465,7 @@ function openMobModal(mob, fromHistory) {
           const item = ITEMS.find(i => i.name.toLowerCase() === cleanName.toLowerCase());
           return item
             ? `<span class="chip clickable" data-itemid="${item.id}" title="View ${item.name}">🎁 ${d}</span>`
-            : `<span class="chip">🎁 ${d}</span>`;
+            : `<span class="chip clickable" data-relation="${d.replace(/"/g, '&quot;')}">🎁 ${d}</span>`;
         }).join('')
       : '<span class="chip">Nothing</span>';
 
@@ -2387,6 +2505,12 @@ function openMobModal(mob, fromHistory) {
         if (item) { pushHistory(render); openItemModal(item, true); }
       });
     });
+    modalBody.querySelectorAll('[data-relation]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        pushHistory(render);
+        openRelationModal(chip.dataset.relation, true);
+      });
+    });
 
     // Bind spawn chip
     modalBody.querySelectorAll('[data-locid]').forEach(chip => {
@@ -2423,7 +2547,9 @@ function openItemModal(item, fromHistory) {
           if (targetItem) return `<span class="chip clickable ingredient-chip" data-itemid="${targetItem.id}">${u}</span>`;
           const concept = findConcept(u);
           if (concept) return `<span class="chip concept-chip clickable" data-conceptid="${concept.id}">${concept.emoji} ${u}</span>`;
-          return `<span class="chip">${u}</span>`;
+          const rel = resolveEntityLink(u, null, ['item','structure','location','mob','concept']);
+          if (rel) return `<span class="chip clickable ingredient-chip" data-linktype="${rel.type}" data-linkid="${rel.value.id}">${u}</span>`;
+          return `<span class="chip clickable" data-relation="${u.replace(/"/g, '&quot;')}">${u}</span>`;
         }).join('')
       : '<span class="chip">Decorative / Direct Use</span>';
 
@@ -2433,7 +2559,7 @@ function openItemModal(item, fromHistory) {
           const ing = ITEMS.find(i => i.id === c.itemId);
           return ing
             ? `<span class="chip ingredient-chip clickable" data-itemid="${ing.id}">${ing.emoji} ${ing.name} ×${c.qty}</span>`
-            : `<span class="chip">${c.itemId} ×${c.qty}</span>`;
+            : `<span class="chip clickable" data-relation="${itemIdToLabel(c.itemId)}">${itemIdToLabel(c.itemId)} ×${c.qty}</span>`;
         }).join('')
       : '<span class="chip" style="color:var(--text-dim)">Not craftable</span>';
 
@@ -2485,6 +2611,20 @@ function openItemModal(item, fromHistory) {
       });
     });
 
+    modalBody.querySelectorAll('[data-linktype][data-linkid]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const link = resolveEntityLink('', chip.dataset.linkid);
+        if (link) openLinkedEntity(link, render);
+      });
+    });
+
+    modalBody.querySelectorAll('[data-relation]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        pushHistory(render);
+        openRelationModal(chip.dataset.relation, true);
+      });
+    });
+
     // Bind mob thumbnails
     modalBody.querySelectorAll('.mob-thumb[data-mobid]').forEach(thumb => {
       thumb.addEventListener('click', () => {
@@ -2519,7 +2659,7 @@ function openLocationModal(loc, fromHistory) {
           );
           return found
             ? `<span class="chip struct-chip clickable" data-structid="${found.id}">${found.emoji} ${s}</span>`
-            : `<span class="chip">${s}</span>`;
+            : `<span class="chip clickable" data-relation="${s.replace(/"/g, '&quot;')}">${s}</span>`;
         }).join('')
       : '<span class="chip" style="color:var(--text-dim)">None</span>';
 
@@ -2539,7 +2679,7 @@ function openLocationModal(loc, fromHistory) {
           const item = ITEMS.find(i => i.name.toLowerCase() === rClean.toLowerCase());
           return item
             ? `<span class="chip resource-chip clickable" data-itemid="${item.id}">${item.emoji} ${r}</span>`
-            : `<span class="chip resource-chip">${r}</span>`;
+            : `<span class="chip resource-chip clickable" data-relation="${r.replace(/"/g, '&quot;')}">${r}</span>`;
         }).join('')
       : '<span class="chip" style="color:var(--text-dim)">None</span>';
 
@@ -2576,6 +2716,12 @@ function openLocationModal(loc, fromHistory) {
         if (item) { pushHistory(render); openItemModal(item, true); }
       });
     });
+    modalBody.querySelectorAll('[data-relation]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        pushHistory(render);
+        openRelationModal(chip.dataset.relation, true);
+      });
+    });
   };
 
   if (!fromHistory) openModal(render);
@@ -2602,14 +2748,14 @@ function openStructureModal(struct, fromHistory) {
           const item = idItem || nameItem;
           return item
             ? `<span class="chip clickable" data-itemid="${item.id}" title="View ${item.name}">🎁 ${l}</span>`
-            : `<span class="chip">🎁 ${l}</span>`;
+            : `<span class="chip clickable" data-relation="${l.replace(/"/g, '&quot;')}">🎁 ${l}</span>`;
         }).join('')
       : '<span class="chip" style="color:var(--text-dim)">No notable loot</span>';
 
     const mobsHtml = struct.mobs.length > 0
       ? struct.mobs.map(mid => {
           const mob = MOBS.find(m => m.id === mid);
-          if (!mob) return `<span class="chip mob-chip">${mid}</span>`;
+          if (!mob) return `<span class="chip mob-chip clickable" data-relation="${mid.replace(/_/g,' ')}">${mid.replace(/_/g,' ')}</span>`;
           return `<span class="chip mob-chip clickable" data-mobid="${mob.id}">${mob.emoji} ${mob.name}</span>`;
         }).join('')
       : '<span class="chip" style="color:var(--text-dim)">No unique mobs</span>';
@@ -2639,6 +2785,12 @@ function openStructureModal(struct, fromHistory) {
       chip.addEventListener('click', () => {
         const item = ITEMS.find(i => i.id === chip.dataset.itemid);
         if (item) { pushHistory(render); openItemModal(item, true); }
+      });
+    });
+    modalBody.querySelectorAll('[data-relation]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        pushHistory(render);
+        openRelationModal(chip.dataset.relation, true);
       });
     });
   };
